@@ -29,7 +29,7 @@ namespace Cs2GlobalAdrTracker.Views
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            if (RuntimeStorage.Configuration.RuntimeConfiguration.WindowStartupLocation != null)
+            if (RuntimeStorage.Configuration.RuntimeConfiguration.WindowStartupLocation != default)
             {
                 this.Left = RuntimeStorage.Configuration.RuntimeConfiguration.WindowStartupLocation.X;
                 this.Top = RuntimeStorage.Configuration.RuntimeConfiguration.WindowStartupLocation.Y;
@@ -45,14 +45,12 @@ namespace Cs2GlobalAdrTracker.Views
             if (e.ChangedButton == MouseButton.Left)
             {
                 this.DragMove();
-                if (RuntimeStorage.Configuration.RuntimeConfiguration.WindowStartupLocation == null)
+                if (RuntimeStorage.Configuration.RuntimeConfiguration.WindowStartupLocation == default)
                 {
                     RuntimeStorage.Configuration.RuntimeConfiguration.WindowStartupLocation = new();
                 }
 
-                RuntimeStorage.Configuration.RuntimeConfiguration.WindowStartupLocation.X = (int)this.Left;
-                RuntimeStorage.Configuration.RuntimeConfiguration.WindowStartupLocation.Y = (int)this.Top;
-
+                RuntimeStorage.Configuration.RuntimeConfiguration.WindowStartupLocation = new((int)this.Left, (int)this.Top);
                 RuntimeStorage.Configuration.Save();
 
                 Log.Verbose($"Window relocated to coords:\nX: {this.Left}\nY: {this.Top}");
