@@ -24,6 +24,25 @@ namespace UnitTests
             {
                 File.Delete(f);
             }
+
+            this.CreateDummyFile();
+        }
+
+        private void CreateDummyFile()
+        {
+            byte[] randomBytes = new byte[8];
+
+            for (int i = 0; i < randomBytes.Length; i++)
+            {
+                Random rand = new(BitConverter.ToInt32(Guid.NewGuid().ToByteArray()));
+
+                randomBytes[i] = (byte)rand.Next(0, 255);
+            }
+
+            using (FileStream fs = File.Open(Path.Combine(this.nunitTestFolder, "dummy"), FileMode.OpenOrCreate, FileAccess.ReadWrite))
+            {
+                fs.Write(randomBytes, 0, randomBytes.Length);
+            }
         }
 
         [SetUp]
