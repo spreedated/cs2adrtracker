@@ -1,5 +1,4 @@
 ﻿using System.Text.Json.Serialization;
-using YetAnotherMonitor.Models;
 
 namespace Cs2GlobalAdrTracker.Models
 {
