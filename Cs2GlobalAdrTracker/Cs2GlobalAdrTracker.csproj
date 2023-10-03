@@ -39,10 +39,10 @@
 
   <ItemGroup>
     <Reference Include="neXn.Lib.ConfigurationHandler">
-      <HintPath>..\..\neXn.Library\neXn.Lib.ConfigurationHandler\bin\Release\net7.0\neXn.Lib.ConfigurationHandler.dll</HintPath>
+      <HintPath>..\Libraries\neXn.Lib.ConfigurationHandler.dll</HintPath>
     </Reference>
     <Reference Include="neXn.Lib.Wpf">
-      <HintPath>..\..\neXn.Library\neXn.Lib.Wpf\bin\Release\net6.0-windows\neXn.Lib.Wpf.dll</HintPath>
+      <HintPath>..\Libraries\neXn.Lib.Wpf.dll</HintPath>
     </Reference>
   </ItemGroup>
 
