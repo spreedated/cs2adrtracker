@@ -1,0 +1,7 @@
+﻿CREATE TABLE "adrs"
+(
+	"id" INTEGER NOT NULL,
+	"value" INTEGER NOT NULL,
+	"timestamp" INTEGER,
+	PRIMARY KEY("id" AUTOINCREMENT)
+);

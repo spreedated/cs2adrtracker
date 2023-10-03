@@ -1,0 +1,107 @@
+﻿<Window x:Class="Cs2GlobalAdrTracker.Views.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:sys="clr-namespace:System;assembly=mscorlib"
+        xmlns:local="clr-namespace:Cs2GlobalAdrTracker"
+        xmlns:vm="clr-namespace:Cs2GlobalAdrTracker.ViewModels"
+        xmlns:svgc="http://sharpvectors.codeplex.com/svgc/"
+        xmlns:behaviors="http://schemas.microsoft.com/xaml/behaviors"
+        mc:Ignorable="d"
+        MinHeight="142"
+        MinWidth="220"
+        Width="220"
+        WindowStartupLocation="Manual"
+        ResizeMode="NoResize"
+        AllowsTransparency="True"
+        Background="Transparent"
+        Opacity="0.8"
+        WindowStyle="None"
+        MouseDown="Window_MouseDown"
+        Topmost="True"
+        Closing="Window_Closing"
+        SizeToContent="Height"
+        Icon="pack://application:,,,/Resources/logo_512x512.png"
+        ShowInTaskbar="False"
+        Loaded="Window_Loaded">
+
+    <Window.DataContext>
+        <vm:MainWindowViewModel/>
+    </Window.DataContext>
+
+    <Window.Resources>
+        <sys:Double x:Key="IndicatorDotSize">10</sys:Double>
+        <sys:Double x:Key="LogoSize">24</sys:Double>
+    </Window.Resources>
+    
+    <Border Background="#222222" CornerRadius="16">
+        <Grid Margin="0,10,0,0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto" />
+                <RowDefinition Height="auto" />
+                <RowDefinition Height="auto" />
+            </Grid.RowDefinitions>
+
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                <svgc:SvgViewbox Source="pack://application:,,,/Resources/logo.svg" Width="{StaticResource LogoSize}" Height="{StaticResource LogoSize}" Margin="0,0,4,0"/>
+                <Label Grid.Row="0" Content="CS2 ADR Tracker" Style="{StaticResource Headline}"/>
+            </StackPanel>
+
+            <Grid Grid.Row="1" Margin="8">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                
+                <TextBlock Grid.Column="0" Grid.ColumnSpan="2" d:Text="   Current ADR: ##&#xA;Tracked games: ##" FontFamily="{StaticResource Stratum}" HorizontalAlignment="Center">
+                    <TextBlock.Text>
+                        <MultiBinding StringFormat="{}   Current ADR: {0:#.##} &#xA;Tracked games: {1}">
+                            <Binding Path="CurrentAdr"/>
+                            <Binding Path="TrackedGamesCount"/>
+                        </MultiBinding>
+                    </TextBlock.Text>
+                </TextBlock>
+
+                <Border Grid.Column="1" CornerRadius="2" HorizontalAlignment="Right" Margin="0,0,18,0" Width="{StaticResource IndicatorDotSize}" Height="{StaticResource IndicatorDotSize}" Background="{Binding IndicatorBrush}" />
+            </Grid>
+
+            <StackPanel Grid.Row="2" Margin="8">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
+
+                    <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Center">
+                        <Label  HorizontalAlignment="Right" Content="Add new ADR:" Margin="0,0,4,0"/>
+                        <TextBox Text="{Binding InputAdr, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" MinWidth="36" MaxLength="3">
+                            <TextBox.InputBindings>
+                                <KeyBinding Key="Return" Command="{Binding AddCommand}" CommandParameter="{Binding Instance}"/>
+                            </TextBox.InputBindings>
+                        </TextBox>
+                    </StackPanel>
+
+                    <Button Grid.Row="1" HorizontalAlignment="Center" Margin="0,8,0,0" Padding="8,2,8,2" Content="Add" d:Visibility="Visible" Command="{Binding AddCommand}" CommandParameter="{Binding Instance}">
+                        <Button.Style>
+                            <Style BasedOn="{StaticResource {x:Type Button}}" TargetType="Button">
+                                <Style.Triggers>
+                                    <MultiDataTrigger>
+                                        <MultiDataTrigger.Conditions>
+                                            <Condition Binding="{Binding HasLength}" Value="True"/>
+                                            <Condition Binding="{Binding IsInputNumeric}" Value="True"/>
+                                        </MultiDataTrigger.Conditions>
+
+                                        <Setter Property="Visibility" Value="Visible"/>
+                                    </MultiDataTrigger>
+                                </Style.Triggers>
+
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                            </Style>
+                        </Button.Style>
+                    </Button>
+                </Grid>
+            </StackPanel>
+        </Grid>
+    </Border>
+</Window>

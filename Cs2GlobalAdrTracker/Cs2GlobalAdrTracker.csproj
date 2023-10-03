@@ -1,0 +1,58 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net7.0-windows</TargetFramework>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+    <NoWarn>1701;1702;IDE0063</NoWarn>
+    <SignAssembly>True</SignAssembly>
+    <AssemblyOriginatorKeyFile>adrtracker.snk</AssemblyOriginatorKeyFile>
+    <Authors>Markus Karl Wackermann</Authors>
+    <Version>1.0.0</Version>
+    <AssemblyTitle>CS2 ADR Tracker</AssemblyTitle>
+    <Title>CS2 ADR Tracker</Title>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Resources\Fonts\stratum2-bold-webfont.ttf" />
+    <None Remove="Resources\Fonts\stratum2-medium-webfont.ttf" />
+    <None Remove="Resources\Fonts\stratum2-regular-webfont.ttf" />
+    <None Remove="Resources\logo.ico" />
+    <None Remove="Resources\logo.svg" />
+    <None Remove="Resources\logo_512x512.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Hardcodet.NotifyIcon.Wpf" Version="1.1.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="Serilog" Version="3.0.1" />
+    <PackageReference Include="Serilog.Sinks.Console" Version="4.1.0" />
+    <PackageReference Include="Serilog.Sinks.Debug" Version="2.0.0" />
+    <PackageReference Include="SharpVectors.Wpf" Version="1.8.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\DatabaseLayer\DatabaseLayer.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="neXn.Lib.ConfigurationHandler">
+      <HintPath>..\..\neXn.Library\neXn.Lib.ConfigurationHandler\bin\Release\net7.0\neXn.Lib.ConfigurationHandler.dll</HintPath>
+    </Reference>
+    <Reference Include="neXn.Lib.Wpf">
+      <HintPath>..\..\neXn.Library\neXn.Lib.Wpf\bin\Release\net6.0-windows\neXn.Lib.Wpf.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Resources\Fonts\stratum2-bold-webfont.ttf" />
+    <Resource Include="Resources\Fonts\stratum2-medium-webfont.ttf" />
+    <Resource Include="Resources\Fonts\stratum2-regular-webfont.ttf" />
+    <Resource Include="Resources\logo.ico" />
+    <Resource Include="Resources\logo.svg" />
+    <Resource Include="Resources\logo_512x512.png" />
+  </ItemGroup>
+
+</Project>
