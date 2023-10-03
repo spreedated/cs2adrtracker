@@ -1,4 +1,4 @@
-﻿namespace YetAnotherMonitor.Models
+﻿namespace Cs2GlobalAdrTracker.Models
 {
     internal class WindowLocation
     {
