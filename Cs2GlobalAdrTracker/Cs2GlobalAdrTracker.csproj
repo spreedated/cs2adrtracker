@@ -13,6 +13,7 @@
     <Version>1.0.0</Version>
     <AssemblyTitle>CS2 ADR Tracker</AssemblyTitle>
     <Title>CS2 ADR Tracker</Title>
+    <ApplicationIcon>logo.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
@@ -22,6 +23,10 @@
     <None Remove="Resources\logo.ico" />
     <None Remove="Resources\logo.svg" />
     <None Remove="Resources\logo_512x512.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="logo.ico" />
   </ItemGroup>
 
   <ItemGroup>

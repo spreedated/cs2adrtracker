@@ -16,7 +16,7 @@ namespace Cs2GlobalAdrTracker.Views
             this.InitializeComponent();
             ((MainWindowViewModel)this.DataContext).Instance = this;
 
-            //this.Title = typeof(MainWindow).Assembly.GetCustomAttribute<AssemblyTitleAttribute>()?.Title;
+            this.Title = typeof(MainWindow).Assembly.GetCustomAttribute<AssemblyTitleAttribute>()?.Title;
 
             ContextMenu s = new();
             MenuItem mm = new() { Header = "Exit", Foreground = Brushes.Black };
