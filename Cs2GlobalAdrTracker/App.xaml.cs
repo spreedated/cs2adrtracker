@@ -31,7 +31,7 @@ namespace Cs2GlobalAdrTracker
 
             Log.Verbose("Configuration loaded");
 
-            RuntimeStorage.Database = new(RuntimeStorage.Configuration.RuntimeConfiguration.Databasefile);
+            RuntimeStorage.Database = new(RuntimeStorage.Configuration.RuntimeConfiguration.DatabaseFile);
 
             Log.Verbose("Database connection established");
         }

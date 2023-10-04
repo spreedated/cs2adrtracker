@@ -23,6 +23,7 @@ namespace Cs2GlobalAdrTracker.Views
             mm.Click += (o, e) => { this.Close(); };
             s.Items.Add(mm);
 
+            this.ContextMenu = s;
             ((MainWindowViewModel)this.DataContext).ContextMenuTaskbar = s;
             ((MainWindowViewModel)this.DataContext).RefreshData();
         }
@@ -50,9 +51,11 @@ namespace Cs2GlobalAdrTracker.Views
                     RuntimeStorage.Configuration.RuntimeConfiguration.WindowStartupLocation = new();
                 }
 
-                RuntimeStorage.Configuration.RuntimeConfiguration.WindowStartupLocation.X = (int)this.Left;
-                RuntimeStorage.Configuration.RuntimeConfiguration.WindowStartupLocation.Y = (int)this.Top;
-
+                RuntimeStorage.Configuration.RuntimeConfiguration.WindowStartupLocation = new()
+                {
+                    X = this.Left,
+                    Y = this.Top
+                };
                 RuntimeStorage.Configuration.Save();
 
                 Log.Verbose($"Window relocated to coords:\nX: {this.Left}\nY: {this.Top}");
