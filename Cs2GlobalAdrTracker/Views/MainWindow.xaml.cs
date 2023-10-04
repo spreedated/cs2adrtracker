@@ -23,6 +23,7 @@ namespace Cs2GlobalAdrTracker.Views
             mm.Click += (o, e) => { this.Close(); };
             s.Items.Add(mm);
 
+            this.ContextMenu = s;
             ((MainWindowViewModel)this.DataContext).ContextMenuTaskbar = s;
             ((MainWindowViewModel)this.DataContext).RefreshData();
         }
