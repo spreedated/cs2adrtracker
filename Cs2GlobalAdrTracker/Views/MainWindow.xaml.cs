@@ -16,7 +16,7 @@ namespace Cs2GlobalAdrTracker.Views
             this.InitializeComponent();
             ((MainWindowViewModel)this.DataContext).Instance = this;
 
-            this.Title = typeof(MainWindow).Assembly.GetCustomAttribute<AssemblyTitleAttribute>()?.Title;
+            //this.Title = typeof(MainWindow).Assembly.GetCustomAttribute<AssemblyTitleAttribute>()?.Title;
 
             ContextMenu s = new();
             MenuItem mm = new() { Header = "Exit", Foreground = Brushes.Black };
@@ -29,7 +29,7 @@ namespace Cs2GlobalAdrTracker.Views
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            if (RuntimeStorage.Configuration.RuntimeConfiguration.WindowStartupLocation != default)
+            if (RuntimeStorage.Configuration.RuntimeConfiguration.WindowStartupLocation != null)
             {
                 this.Left = RuntimeStorage.Configuration.RuntimeConfiguration.WindowStartupLocation.X;
                 this.Top = RuntimeStorage.Configuration.RuntimeConfiguration.WindowStartupLocation.Y;
@@ -45,12 +45,16 @@ namespace Cs2GlobalAdrTracker.Views
             if (e.ChangedButton == MouseButton.Left)
             {
                 this.DragMove();
-                if (RuntimeStorage.Configuration.RuntimeConfiguration.WindowStartupLocation == default)
+                if (RuntimeStorage.Configuration.RuntimeConfiguration.WindowStartupLocation == null)
                 {
                     RuntimeStorage.Configuration.RuntimeConfiguration.WindowStartupLocation = new();
                 }
 
-                RuntimeStorage.Configuration.RuntimeConfiguration.WindowStartupLocation = new((int)this.Left, (int)this.Top);
+                RuntimeStorage.Configuration.RuntimeConfiguration.WindowStartupLocation = new()
+                {
+                    X = this.Left,
+                    Y = this.Top
+                };
                 RuntimeStorage.Configuration.Save();
 
                 Log.Verbose($"Window relocated to coords:\nX: {this.Left}\nY: {this.Top}");
