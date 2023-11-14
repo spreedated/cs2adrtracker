@@ -1,16 +1,29 @@
 ﻿using Cs2GlobalAdrTracker.Logic;
 using Cs2GlobalAdrTracker.ViewModels;
 using Serilog;
+using System;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Interop;
 using System.Windows.Media;
 
 namespace Cs2GlobalAdrTracker.Views
 {
     public partial class MainWindow : Window
     {
+        #region Remove from Alt+Tab Menu
+        private const int GWL_EXSTYLE = -20;
+        private const int WS_EX_TOOLWINDOW = 0x00000080;
+
+        [DllImport("user32.dll")]
+        private static extern int SetWindowLong(IntPtr hWnd, int nIndex, int dwNewLong);
+        [DllImport("user32.dll", SetLastError = true)]
+        private static extern int GetWindowLong(IntPtr hWnd, int nIndex);
+        #endregion
+
         public MainWindow()
         {
             this.InitializeComponent();
@@ -34,9 +47,15 @@ namespace Cs2GlobalAdrTracker.Views
             {
                 this.Left = RuntimeStorage.Configuration.RuntimeConfiguration.WindowStartupLocation.X;
                 this.Top = RuntimeStorage.Configuration.RuntimeConfiguration.WindowStartupLocation.Y;
-                return;
             }
-            this.WindowStartupLocation = WindowStartupLocation.CenterScreen;
+            else
+            {
+                this.WindowStartupLocation = WindowStartupLocation.CenterScreen;
+            }
+
+            IntPtr hwnd = new WindowInteropHelper(this).Handle;
+            int extendedStyle = GetWindowLong(hwnd, GWL_EXSTYLE);
+            _ = SetWindowLong(hwnd, GWL_EXSTYLE, extendedStyle | WS_EX_TOOLWINDOW);
 
             Log.Verbose("Window loaded");
         }
