@@ -76,6 +76,42 @@ namespace DatabaseLayer.DataLayer
             this._conn?.Dispose();
         }
 
+        /// <summary>
+        /// Get the last # of records
+        /// </summary>
+        /// <param name="count">Number of records, default is 10</param>
+        /// <returns></returns>
+        public IEnumerable<AdrRecord> GetLast(int count = 10)
+        {
+            if (count <= 0)
+            {
+                count = 1;
+            }
+
+            using (SQLiteTransaction trans = this._conn.BeginTransaction())
+            {
+                using (SQLiteCommand cmd = this._conn.CreateCommand())
+                {
+                    cmd.CommandText = $"SELECT id,value,timestamp FROM adrs ORDER BY timestamp DESC LIMIT {count};";
+
+                    using (SQLiteDataReader dr = cmd.ExecuteReader())
+                    {
+                        while (dr.Read())
+                        {
+                            yield return new()
+                            {
+                                Id = dr.GetInt32(dr.GetOrdinal("id")),
+                                Value = dr.GetInt32(dr.GetOrdinal("value")),
+                                UnixTimestamp = dr.GetInt32(dr.GetOrdinal("timestamp"))
+                            };
+                        }
+                    }
+                }
+
+                trans.Commit();
+            }
+        }
+
         public IEnumerable<AdrRecord> GetAdrs()
         {
             using (SQLiteTransaction trans = this._conn.BeginTransaction())

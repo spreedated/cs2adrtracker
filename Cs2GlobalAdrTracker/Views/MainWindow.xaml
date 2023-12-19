@@ -41,6 +41,7 @@
                 <RowDefinition Height="auto" />
                 <RowDefinition Height="auto" />
                 <RowDefinition Height="auto" />
+                <RowDefinition Height="auto" />
             </Grid.RowDefinitions>
 
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
@@ -102,6 +103,26 @@
                     </Button>
                 </Grid>
             </StackPanel>
+
+            <Grid Grid.Row="3" Margin="20,0,20,8">
+                <Expander ExpandDirection="Down" d:IsExpanded="True" HorizontalAlignment="Center" MinWidth="140">
+                    <Expander.Header>
+                        <StackPanel>
+                            <TextBlock Text="{Binding Last10Average, StringFormat={}Last 10 Matches ({0:#.##})}"></TextBlock>
+                        </StackPanel>
+                    </Expander.Header>
+                    <Grid>
+                        <ListView ItemsSource="{Binding Last10Records}" BorderThickness="0">
+                            <ListView.View>
+                                <GridView AllowsColumnReorder="False">
+                                    <GridViewColumn DisplayMemberBinding="{Binding DateTime, StringFormat={}{0:dd.MM.yy - HH:mm}, ConverterCulture=de-DE}" Header="Date" Width="90"/>
+                                    <GridViewColumn DisplayMemberBinding="{Binding Value}" Header="ADR" Width="28"/>
+                                </GridView>
+                            </ListView.View>
+                        </ListView>
+                    </Grid>
+                </Expander>
+            </Grid>
         </Grid>
     </Border>
 </Window>

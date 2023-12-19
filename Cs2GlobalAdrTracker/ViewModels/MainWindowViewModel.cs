@@ -6,6 +6,7 @@ using neXn.Lib.Wpf.ViewLogic;
 using Serilog;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
@@ -65,9 +66,39 @@ namespace Cs2GlobalAdrTracker.ViewModels
 
                 this.CurrentAdr = adrs.Any() ? (float)adrs.Average(x => x.Value) : 0f;
                 this.TrackedGamesCount = adrs.Any() ? adrs.Count() : 0;
+                this.Last10Records = new(RuntimeStorage.Database.GetLast());
+                this.Last10Average = this.Last10Records.Any() ? (float)this.Last10Records.Average(x => x.Value) : 0f;
 
                 Log.Information("Data refreshed");
             });
+        }
+
+        private ObservableCollection<AdrRecord> _Last10Records;
+        public ObservableCollection<AdrRecord> Last10Records
+        {
+            get
+            {
+                return this._Last10Records;
+            }
+            set
+            {
+                this._Last10Records = value;
+                base.OnPropertyChanged(nameof(this.Last10Records));
+            }
+        }
+
+        private float _Last10Average;
+        public float Last10Average
+        {
+            get
+            {
+                return this._Last10Average;
+            }
+            set
+            {
+                this._Last10Average = value;
+                base.OnPropertyChanged(nameof(this.Last10Average));
+            }
         }
 
         private ContextMenu _ContextMenuTaskbar;
