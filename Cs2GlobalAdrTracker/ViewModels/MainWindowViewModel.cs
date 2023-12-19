@@ -39,17 +39,20 @@ namespace Cs2GlobalAdrTracker.ViewModels
                 return;
             }
 
+            AdrRecord.Outcomes outcome = ((MainWindowViewModel)w.DataContext).Outcome;
+
             ((MainWindowViewModel)w.DataContext).InputAdr = null;
+            w.ResetOutcomeComboBox();
 
             Task.Factory.StartNew(() =>
             {
-                if (!RuntimeStorage.Database.AddAdr(new AdrRecord() { Value = outadr, UnixTimestamp = DateTimeOffset.Now.ToUnixTimeSeconds() }))
+                if (!RuntimeStorage.Database.AddAdr(new AdrRecord() { Value = outadr, UnixTimestamp = DateTimeOffset.Now.ToUnixTimeSeconds(), Outcome = outcome }))
                 {
                     Log.Warning($"ADR value \"{outadr}\" NOT added to database due to being invalid");
                     return;
                 }
 
-                Log.Information($"ADR value \"{outadr}\" added to database");
+                Log.Information($"ADR value \"{outadr}\" (Outcome: \"{outcome}\") added to database");
 
                 w.Dispatcher.Invoke(() =>
                 {
@@ -71,6 +74,20 @@ namespace Cs2GlobalAdrTracker.ViewModels
 
                 Log.Information("Data refreshed");
             });
+        }
+
+        private AdrRecord.Outcomes _Outcome;
+        public AdrRecord.Outcomes Outcome
+        {
+            get
+            {
+                return this._Outcome;
+            }
+            set
+            {
+                this._Outcome = value;
+                base.OnPropertyChanged(nameof(this.Outcome));
+            }
         }
 
         private ObservableCollection<AdrRecord> _Last10Records;

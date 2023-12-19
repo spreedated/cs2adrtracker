@@ -4,8 +4,17 @@ namespace DatabaseLayer.Models
 {
     public record AdrRecord
     {
+        public enum Outcomes
+        {
+            Unkown = 0,
+            Lose,
+            Win,
+            Draw
+        }
+
         public int Id { get; set; }
         public int Value { get; set; }
+        public Outcomes Outcome { get; set; }
         public long UnixTimestamp { get; set; }
         public DateTime DateTime
         {
