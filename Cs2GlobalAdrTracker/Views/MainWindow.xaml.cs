@@ -1,5 +1,6 @@
 ﻿using Cs2GlobalAdrTracker.Logic;
 using Cs2GlobalAdrTracker.ViewModels;
+using DatabaseLayer.Models;
 using Serilog;
 using System;
 using System.Reflection;
@@ -85,6 +86,11 @@ namespace Cs2GlobalAdrTracker.Views
         {
             Log.Verbose("Window closing");
             ((MainWindowViewModel)this.DataContext)?.DisposeNotifyIcon();
+        }
+
+        public void ResetOutcomeComboBox()
+        {
+            this.CMB_Outcome.SelectedIndex = 0;
         }
     }
 }
