@@ -10,7 +10,7 @@
     <SignAssembly>True</SignAssembly>
     <AssemblyOriginatorKeyFile>adrtracker.snk</AssemblyOriginatorKeyFile>
     <Authors>Markus Karl Wackermann</Authors>
-    <Version>1.0.2</Version>
+    <Version>1.0.3</Version>
     <AssemblyTitle>CS2 ADR Tracker</AssemblyTitle>
     <Title>CS2 ADR Tracker</Title>
     <ApplicationIcon>logo.ico</ApplicationIcon>
