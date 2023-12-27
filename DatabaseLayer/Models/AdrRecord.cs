@@ -6,7 +6,7 @@ namespace DatabaseLayer.Models
     {
         public enum Outcomes
         {
-            Unkown = 0,
+            Unknown,
             Lose,
             Win,
             Draw
@@ -16,18 +16,7 @@ namespace DatabaseLayer.Models
         public int Value { get; set; }
         public Outcomes Outcome { get; set; }
         public long UnixTimestamp { get; set; }
-        public DateTime DateTime
-        {
-            get
-            {
-                return UnixTimeStampToDateTime(this.UnixTimestamp);
-            }
-        }
-
-        private static DateTime UnixTimeStampToDateTime(double unixTimeStamp)
-        {
-            return DateTime.UnixEpoch.AddSeconds(unixTimeStamp).ToLocalTime();
-        }
+        public DateTime DateTime => DateTime.UnixEpoch.AddSeconds(this.UnixTimestamp).ToLocalTime();
 
         public bool IsValid()
         {
