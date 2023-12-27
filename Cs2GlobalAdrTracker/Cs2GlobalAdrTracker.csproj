@@ -55,7 +55,9 @@
     <Resource Include="Resources\Fonts\stratum2-bold-webfont.ttf" />
     <Resource Include="Resources\Fonts\stratum2-medium-webfont.ttf" />
     <Resource Include="Resources\Fonts\stratum2-regular-webfont.ttf" />
-    <Resource Include="Resources\logo.ico" />
+    <Resource Include="Resources\logo.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
     <Resource Include="Resources\logo.svg" />
     <Resource Include="Resources\logo_512x512.png" />
   </ItemGroup>

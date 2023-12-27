@@ -108,7 +108,7 @@ namespace DatabaseLayer.DataLayer
                                     1 => AdrRecord.Outcomes.Lose,
                                     2 => AdrRecord.Outcomes.Win,
                                     3 => AdrRecord.Outcomes.Draw,
-                                    _ => AdrRecord.Outcomes.Unkown
+                                    _ => AdrRecord.Outcomes.Unknown
                                 }
                             };
                         }
@@ -141,7 +141,7 @@ namespace DatabaseLayer.DataLayer
                                     1 => AdrRecord.Outcomes.Lose,
                                     2 => AdrRecord.Outcomes.Win,
                                     3 => AdrRecord.Outcomes.Draw,
-                                    _ => AdrRecord.Outcomes.Unkown
+                                    _ => AdrRecord.Outcomes.Unknown
                                 }
                             };
                         }
