@@ -6,6 +6,8 @@
         xmlns:sys="clr-namespace:System;assembly=mscorlib"
         xmlns:local="clr-namespace:Cs2GlobalAdrTracker"
         xmlns:vm="clr-namespace:Cs2GlobalAdrTracker.ViewModels"
+        xmlns:vl="clr-namespace:Cs2GlobalAdrTracker.ViewLogic"
+        xmlns:m="clr-namespace:DatabaseLayer.Models;assembly=DatabaseLayer"
         xmlns:svgc="http://sharpvectors.codeplex.com/svgc/"
         xmlns:behaviors="http://schemas.microsoft.com/xaml/behaviors"
         mc:Ignorable="d"
@@ -38,6 +40,7 @@
     <Border Background="#222222" CornerRadius="16">
         <Grid Margin="0,10,0,0">
             <Grid.RowDefinitions>
+                <RowDefinition Height="auto" />
                 <RowDefinition Height="auto" />
                 <RowDefinition Height="auto" />
                 <RowDefinition Height="auto" />
@@ -80,6 +83,12 @@
                                 <KeyBinding Key="Return" Command="{Binding AddCommand}" CommandParameter="{Binding Instance}"/>
                             </TextBox.InputBindings>
                         </TextBox>
+                        <ComboBox x:Name="CMB_Outcome" Margin="8,0,0,0" Width="64" SelectedItem="{Binding Outcome, Converter={vl:StringToOutcomeConverter}}">
+                            <ComboBoxItem Content="None" IsSelected="True"/>
+                            <ComboBoxItem Content="Win"/>
+                            <ComboBoxItem Content="Lose"/>
+                            <ComboBoxItem Content="Draw"/>
+                        </ComboBox>
                     </StackPanel>
 
                     <Button Grid.Row="1" HorizontalAlignment="Center" Margin="0,8,0,0" Padding="8,2,8,2" Content="Add" d:Visibility="Visible" Command="{Binding AddCommand}" CommandParameter="{Binding Instance}">
@@ -102,6 +111,49 @@
                     </Button>
                 </Grid>
             </StackPanel>
+
+            <Grid Grid.Row="3" Margin="20,0,20,8">
+                <Expander ExpandDirection="Down" d:IsExpanded="True" HorizontalAlignment="Center" MinWidth="180">
+                    <Expander.Header>
+                        <StackPanel>
+                            <TextBlock Text="{Binding Last10Average, StringFormat={}Last 10 Matches ({0:#.##})}"></TextBlock>
+                        </StackPanel>
+                    </Expander.Header>
+                    <Grid>
+                        <ListView d:ItemsSource="{d:SampleData}" ItemsSource="{Binding Last10Records}" BorderThickness="0">
+                            <ListView.View>
+                                <GridView AllowsColumnReorder="False">
+                                    <GridViewColumn DisplayMemberBinding="{Binding DateTime, StringFormat={}{0:dd.MM.yy - HH:mm}, ConverterCulture=de-DE}" Header="Date" Width="90"/>
+                                    <GridViewColumn DisplayMemberBinding="{Binding Value}" Header="ADR" Width="30"/>
+                                    <GridViewColumn  Header="Outcome" Width="52">
+                                        <GridViewColumn.CellTemplate>
+                                            <DataTemplate DataType="{x:Type m:AdrRecord}">
+                                                <TextBlock Text="{Binding Outcome}">
+                                                    <TextBlock.Style>
+                                                        <Style TargetType="TextBlock">
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding Outcome}" Value="Lose">
+                                                                    <Setter Property="Foreground" Value="Red"/>
+                                                                </DataTrigger>
+                                                                <DataTrigger Binding="{Binding Outcome}" Value="Draw">
+                                                                    <Setter Property="Foreground" Value="Yellow"/>
+                                                                </DataTrigger>
+                                                                <DataTrigger Binding="{Binding Outcome}" Value="Win">
+                                                                    <Setter Property="Foreground" Value="LawnGreen"/>
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </TextBlock.Style>
+                                                </TextBlock>
+                                            </DataTemplate>
+                                        </GridViewColumn.CellTemplate>
+                                    </GridViewColumn>
+                                </GridView>
+                            </ListView.View>
+                        </ListView>
+                    </Grid>
+                </Expander>
+            </Grid>
         </Grid>
     </Border>
 </Window>

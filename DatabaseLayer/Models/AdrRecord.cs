@@ -4,21 +4,19 @@ namespace DatabaseLayer.Models
 {
     public record AdrRecord
     {
-        public int Id { get; set; }
-        public int Value { get; set; }
-        public long UnixTimestamp { get; set; }
-        public DateTime DateTime
+        public enum Outcomes
         {
-            get
-            {
-                return UnixTimeStampToDateTime(this.UnixTimestamp);
-            }
+            Unknown,
+            Lose,
+            Win,
+            Draw
         }
 
-        private static DateTime UnixTimeStampToDateTime(double unixTimeStamp)
-        {
-            return DateTime.UnixEpoch.AddSeconds(unixTimeStamp).ToLocalTime();
-        }
+        public int Id { get; set; }
+        public int Value { get; set; }
+        public Outcomes Outcome { get; set; }
+        public long UnixTimestamp { get; set; }
+        public DateTime DateTime => DateTime.UnixEpoch.AddSeconds(this.UnixTimestamp).ToLocalTime();
 
         public bool IsValid()
         {

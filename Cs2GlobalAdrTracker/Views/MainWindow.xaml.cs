@@ -1,16 +1,30 @@
 ﻿using Cs2GlobalAdrTracker.Logic;
 using Cs2GlobalAdrTracker.ViewModels;
+using DatabaseLayer.Models;
 using Serilog;
+using System;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Interop;
 using System.Windows.Media;
 
 namespace Cs2GlobalAdrTracker.Views
 {
     public partial class MainWindow : Window
     {
+        #region Remove from Alt+Tab Menu
+        private const int GWL_EXSTYLE = -20;
+        private const int WS_EX_TOOLWINDOW = 0x00000080;
+
+        [DllImport("user32.dll")]
+        private static extern int SetWindowLong(IntPtr hWnd, int nIndex, int dwNewLong);
+        [DllImport("user32.dll", SetLastError = true)]
+        private static extern int GetWindowLong(IntPtr hWnd, int nIndex);
+        #endregion
+
         public MainWindow()
         {
             this.InitializeComponent();
@@ -23,19 +37,26 @@ namespace Cs2GlobalAdrTracker.Views
             mm.Click += (o, e) => { this.Close(); };
             s.Items.Add(mm);
 
+            this.ContextMenu = s;
             ((MainWindowViewModel)this.DataContext).ContextMenuTaskbar = s;
             ((MainWindowViewModel)this.DataContext).RefreshData();
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            if (RuntimeStorage.Configuration.RuntimeConfiguration.WindowStartupLocation != default)
+            if (RuntimeStorage.Configuration.RuntimeConfiguration.WindowStartupLocation != null)
             {
                 this.Left = RuntimeStorage.Configuration.RuntimeConfiguration.WindowStartupLocation.X;
                 this.Top = RuntimeStorage.Configuration.RuntimeConfiguration.WindowStartupLocation.Y;
-                return;
             }
-            this.WindowStartupLocation = WindowStartupLocation.CenterScreen;
+            else
+            {
+                this.WindowStartupLocation = WindowStartupLocation.CenterScreen;
+            }
+
+            IntPtr hwnd = new WindowInteropHelper(this).Handle;
+            int extendedStyle = GetWindowLong(hwnd, GWL_EXSTYLE);
+            _ = SetWindowLong(hwnd, GWL_EXSTYLE, extendedStyle | WS_EX_TOOLWINDOW);
 
             Log.Verbose("Window loaded");
         }
@@ -45,12 +66,16 @@ namespace Cs2GlobalAdrTracker.Views
             if (e.ChangedButton == MouseButton.Left)
             {
                 this.DragMove();
-                if (RuntimeStorage.Configuration.RuntimeConfiguration.WindowStartupLocation == default)
+                if (RuntimeStorage.Configuration.RuntimeConfiguration.WindowStartupLocation == null)
                 {
                     RuntimeStorage.Configuration.RuntimeConfiguration.WindowStartupLocation = new();
                 }
 
-                RuntimeStorage.Configuration.RuntimeConfiguration.WindowStartupLocation = new((int)this.Left, (int)this.Top);
+                RuntimeStorage.Configuration.RuntimeConfiguration.WindowStartupLocation = new()
+                {
+                    X = this.Left,
+                    Y = this.Top
+                };
                 RuntimeStorage.Configuration.Save();
 
                 Log.Verbose($"Window relocated to coords:\nX: {this.Left}\nY: {this.Top}");
@@ -61,6 +86,11 @@ namespace Cs2GlobalAdrTracker.Views
         {
             Log.Verbose("Window closing");
             ((MainWindowViewModel)this.DataContext)?.DisposeNotifyIcon();
+        }
+
+        public void ResetOutcomeComboBox()
+        {
+            this.CMB_Outcome.SelectedIndex = 0;
         }
     }
 }

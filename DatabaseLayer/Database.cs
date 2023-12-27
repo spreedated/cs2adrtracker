@@ -76,13 +76,23 @@ namespace DatabaseLayer.DataLayer
             this._conn?.Dispose();
         }
 
-        public IEnumerable<AdrRecord> GetAdrs()
+        /// <summary>
+        /// Get the last # of records
+        /// </summary>
+        /// <param name="count">Number of records, default is 10</param>
+        /// <returns></returns>
+        public IEnumerable<AdrRecord> GetLast(int count = 10)
         {
+            if (count <= 0)
+            {
+                count = 1;
+            }
+
             using (SQLiteTransaction trans = this._conn.BeginTransaction())
             {
                 using (SQLiteCommand cmd = this._conn.CreateCommand())
                 {
-                    cmd.CommandText = "SELECT id,value,timestamp FROM adrs;";
+                    cmd.CommandText = $"SELECT id,value,timestamp,outcome FROM adrs ORDER BY timestamp DESC LIMIT {count};";
 
                     using (SQLiteDataReader dr = cmd.ExecuteReader())
                     {
@@ -92,7 +102,47 @@ namespace DatabaseLayer.DataLayer
                             {
                                 Id = dr.GetInt32(dr.GetOrdinal("id")),
                                 Value = dr.GetInt32(dr.GetOrdinal("value")),
-                                UnixTimestamp = dr.GetInt32(dr.GetOrdinal("timestamp"))
+                                UnixTimestamp = dr.GetInt32(dr.GetOrdinal("timestamp")),
+                                Outcome = dr.GetInt32(dr.GetOrdinal("outcome")) switch
+                                {
+                                    1 => AdrRecord.Outcomes.Lose,
+                                    2 => AdrRecord.Outcomes.Win,
+                                    3 => AdrRecord.Outcomes.Draw,
+                                    _ => AdrRecord.Outcomes.Unknown
+                                }
+                            };
+                        }
+                    }
+                }
+
+                trans.Commit();
+            }
+        }
+
+        public IEnumerable<AdrRecord> GetAdrs()
+        {
+            using (SQLiteTransaction trans = this._conn.BeginTransaction())
+            {
+                using (SQLiteCommand cmd = this._conn.CreateCommand())
+                {
+                    cmd.CommandText = "SELECT id,value,timestamp,outcome FROM adrs;";
+
+                    using (SQLiteDataReader dr = cmd.ExecuteReader())
+                    {
+                        while (dr.Read())
+                        {
+                            yield return new()
+                            {
+                                Id = dr.GetInt32(dr.GetOrdinal("id")),
+                                Value = dr.GetInt32(dr.GetOrdinal("value")),
+                                UnixTimestamp = dr.GetInt32(dr.GetOrdinal("timestamp")),
+                                Outcome = dr.GetInt32(dr.GetOrdinal("outcome")) switch
+                                {
+                                    1 => AdrRecord.Outcomes.Lose,
+                                    2 => AdrRecord.Outcomes.Win,
+                                    3 => AdrRecord.Outcomes.Draw,
+                                    _ => AdrRecord.Outcomes.Unknown
+                                }
                             };
                         }
                     }
@@ -106,9 +156,24 @@ namespace DatabaseLayer.DataLayer
         {
             SQLiteCommand cmd = this._conn.CreateCommand();
 
-            cmd.CommandText = "INSERT INTO adrs (value,timestamp) VALUES (@v,@t);";
+            cmd.CommandText = "INSERT INTO adrs (value,timestamp,outcome) VALUES (@v,@t,@o);";
             cmd.Parameters.AddWithValue("@v", adr.Value);
             cmd.Parameters.AddWithValue("@t", adr.UnixTimestamp);
+            switch (adr.Outcome)
+            {
+                case AdrRecord.Outcomes.Lose:
+                    cmd.Parameters.AddWithValue("@o", 1);
+                    break;
+                case AdrRecord.Outcomes.Win:
+                    cmd.Parameters.AddWithValue("@o", 2);
+                    break;
+                case AdrRecord.Outcomes.Draw:
+                    cmd.Parameters.AddWithValue("@o", 3);
+                    break;
+                default:
+                    cmd.Parameters.AddWithValue("@o", 0);
+                    break;
+            }
 
             return cmd;
         }
