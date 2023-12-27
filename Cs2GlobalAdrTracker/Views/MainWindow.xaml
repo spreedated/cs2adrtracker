@@ -7,6 +7,7 @@
         xmlns:local="clr-namespace:Cs2GlobalAdrTracker"
         xmlns:vm="clr-namespace:Cs2GlobalAdrTracker.ViewModels"
         xmlns:vl="clr-namespace:Cs2GlobalAdrTracker.ViewLogic"
+        xmlns:m="clr-namespace:DatabaseLayer.Models;assembly=DatabaseLayer"
         xmlns:svgc="http://sharpvectors.codeplex.com/svgc/"
         xmlns:behaviors="http://schemas.microsoft.com/xaml/behaviors"
         mc:Ignorable="d"
@@ -119,12 +120,34 @@
                         </StackPanel>
                     </Expander.Header>
                     <Grid>
-                        <ListView ItemsSource="{Binding Last10Records}" BorderThickness="0">
+                        <ListView d:ItemsSource="{d:SampleData}" ItemsSource="{Binding Last10Records}" BorderThickness="0">
                             <ListView.View>
                                 <GridView AllowsColumnReorder="False">
                                     <GridViewColumn DisplayMemberBinding="{Binding DateTime, StringFormat={}{0:dd.MM.yy - HH:mm}, ConverterCulture=de-DE}" Header="Date" Width="90"/>
                                     <GridViewColumn DisplayMemberBinding="{Binding Value}" Header="ADR" Width="30"/>
-                                    <GridViewColumn DisplayMemberBinding="{Binding Outcome}" Header="Outcome" Width="52"/>
+                                    <GridViewColumn  Header="Outcome" Width="52">
+                                        <GridViewColumn.CellTemplate>
+                                            <DataTemplate DataType="{x:Type m:AdrRecord}">
+                                                <TextBlock Text="{Binding Outcome}">
+                                                    <TextBlock.Style>
+                                                        <Style TargetType="TextBlock">
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding Outcome}" Value="Lose">
+                                                                    <Setter Property="Foreground" Value="Red"/>
+                                                                </DataTrigger>
+                                                                <DataTrigger Binding="{Binding Outcome}" Value="Draw">
+                                                                    <Setter Property="Foreground" Value="Yellow"/>
+                                                                </DataTrigger>
+                                                                <DataTrigger Binding="{Binding Outcome}" Value="Win">
+                                                                    <Setter Property="Foreground" Value="LawnGreen"/>
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </TextBlock.Style>
+                                                </TextBlock>
+                                            </DataTemplate>
+                                        </GridViewColumn.CellTemplate>
+                                    </GridViewColumn>
                                 </GridView>
                             </ListView.View>
                         </ListView>

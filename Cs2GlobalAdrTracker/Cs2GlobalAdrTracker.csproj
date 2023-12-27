@@ -10,7 +10,7 @@
     <SignAssembly>True</SignAssembly>
     <AssemblyOriginatorKeyFile>adrtracker.snk</AssemblyOriginatorKeyFile>
     <Authors>Markus Karl Wackermann</Authors>
-    <Version>1.0.2</Version>
+    <Version>1.0.3</Version>
     <AssemblyTitle>CS2 ADR Tracker</AssemblyTitle>
     <Title>CS2 ADR Tracker</Title>
     <ApplicationIcon>logo.ico</ApplicationIcon>
@@ -55,7 +55,9 @@
     <Resource Include="Resources\Fonts\stratum2-bold-webfont.ttf" />
     <Resource Include="Resources\Fonts\stratum2-medium-webfont.ttf" />
     <Resource Include="Resources\Fonts\stratum2-regular-webfont.ttf" />
-    <Resource Include="Resources\logo.ico" />
+    <Resource Include="Resources\logo.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
     <Resource Include="Resources\logo.svg" />
     <Resource Include="Resources\logo_512x512.png" />
   </ItemGroup>
