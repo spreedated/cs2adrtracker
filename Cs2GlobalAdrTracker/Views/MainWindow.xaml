@@ -6,6 +6,7 @@
         xmlns:sys="clr-namespace:System;assembly=mscorlib"
         xmlns:local="clr-namespace:Cs2GlobalAdrTracker"
         xmlns:vm="clr-namespace:Cs2GlobalAdrTracker.ViewModels"
+        xmlns:vl="clr-namespace:Cs2GlobalAdrTracker.ViewLogic"
         xmlns:svgc="http://sharpvectors.codeplex.com/svgc/"
         xmlns:behaviors="http://schemas.microsoft.com/xaml/behaviors"
         mc:Ignorable="d"
@@ -41,6 +42,7 @@
                 <RowDefinition Height="auto" />
                 <RowDefinition Height="auto" />
                 <RowDefinition Height="auto" />
+                <RowDefinition Height="auto" />
             </Grid.RowDefinitions>
 
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
@@ -54,7 +56,7 @@
                     <ColumnDefinition/>
                 </Grid.ColumnDefinitions>
                 
-                <TextBlock Grid.Column="0" Grid.ColumnSpan="2" d:Text="   Current ADR: ##&#xA;Tracked games: ##" FontFamily="{StaticResource Stratum}" HorizontalAlignment="Center">
+                <TextBlock Style="{StaticResource TextBlockStandard}" Grid.Column="0" Grid.ColumnSpan="2" d:Text=" Current ADR: ##&#xA;Tracked games: ##" FontFamily="{StaticResource Stratum}" HorizontalAlignment="Center">
                     <TextBlock.Text>
                         <MultiBinding StringFormat="{}   Current ADR: {0:#.##} &#xA;Tracked games: {1}">
                             <Binding Path="CurrentAdr"/>
@@ -74,17 +76,23 @@
                     </Grid.RowDefinitions>
 
                     <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Center">
-                        <Label  HorizontalAlignment="Right" Content="Add new ADR:" Margin="0,0,4,0"/>
+                        <Label Style="{StaticResource LabelStandard}" HorizontalAlignment="Right" Content="Add new ADR:" Margin="0,0,4,0"/>
                         <TextBox Text="{Binding InputAdr, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" MinWidth="36" MaxLength="3">
                             <TextBox.InputBindings>
                                 <KeyBinding Key="Return" Command="{Binding AddCommand}" CommandParameter="{Binding Instance}"/>
                             </TextBox.InputBindings>
                         </TextBox>
+                        <ComboBox x:Name="CMB_Outcome" Margin="8,0,0,0" Width="64" SelectedItem="{Binding Outcome, Converter={vl:StringToOutcomeConverter}}">
+                            <ComboBoxItem Content="None" IsSelected="True"/>
+                            <ComboBoxItem Content="Win"/>
+                            <ComboBoxItem Content="Lose"/>
+                            <ComboBoxItem Content="Draw"/>
+                        </ComboBox>
                     </StackPanel>
 
                     <Button Grid.Row="1" HorizontalAlignment="Center" Margin="0,8,0,0" Padding="8,2,8,2" Content="Add" d:Visibility="Visible" Command="{Binding AddCommand}" CommandParameter="{Binding Instance}">
                         <Button.Style>
-                            <Style BasedOn="{StaticResource {x:Type Button}}" TargetType="Button">
+                            <Style BasedOn="{StaticResource ButtonStandard}" TargetType="Button">
                                 <Style.Triggers>
                                     <MultiDataTrigger>
                                         <MultiDataTrigger.Conditions>
@@ -102,6 +110,27 @@
                     </Button>
                 </Grid>
             </StackPanel>
+
+            <Grid Grid.Row="3" Margin="20,0,20,8">
+                <Expander ExpandDirection="Down" d:IsExpanded="True" HorizontalAlignment="Center" MinWidth="180">
+                    <Expander.Header>
+                        <StackPanel>
+                            <TextBlock Text="{Binding Last10Average, StringFormat={}Last 10 Matches ({0:#.##})}"></TextBlock>
+                        </StackPanel>
+                    </Expander.Header>
+                    <Grid>
+                        <ListView ItemsSource="{Binding Last10Records}" BorderThickness="0">
+                            <ListView.View>
+                                <GridView AllowsColumnReorder="False">
+                                    <GridViewColumn DisplayMemberBinding="{Binding DateTime, StringFormat={}{0:dd.MM.yy - HH:mm}, ConverterCulture=de-DE}" Header="Date" Width="90"/>
+                                    <GridViewColumn DisplayMemberBinding="{Binding Value}" Header="ADR" Width="30"/>
+                                    <GridViewColumn DisplayMemberBinding="{Binding Outcome}" Header="Outcome" Width="52"/>
+                                </GridView>
+                            </ListView.View>
+                        </ListView>
+                    </Grid>
+                </Expander>
+            </Grid>
         </Grid>
     </Border>
 </Window>

@@ -1,5 +1,4 @@
 ﻿using System.Text.Json.Serialization;
-using YetAnotherMonitor.Models;
 
 namespace Cs2GlobalAdrTracker.Models
 {
@@ -8,6 +7,6 @@ namespace Cs2GlobalAdrTracker.Models
         public WindowLocation WindowStartupLocation { get; set; }
 
         [JsonIgnore()]
-        internal string Databasefile { get; } = "db.nexn";
+        internal string DatabaseFile { get; } = "db.nexn";
     }
 }
