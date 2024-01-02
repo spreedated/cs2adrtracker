@@ -86,7 +86,7 @@
                         <ComboBox x:Name="CMB_Outcome" Margin="8,0,0,0" Width="64" SelectedItem="{Binding Outcome, Converter={vl:StringToOutcomeConverter}}">
                             <ComboBoxItem Content="None" IsSelected="True"/>
                             <ComboBoxItem Content="Win"/>
-                            <ComboBoxItem Content="Lose"/>
+                            <ComboBoxItem Content="Loss"/>
                             <ComboBoxItem Content="Draw"/>
                         </ComboBox>
                     </StackPanel>
@@ -132,7 +132,7 @@
                                                     <TextBlock.Style>
                                                         <Style TargetType="TextBlock">
                                                             <Style.Triggers>
-                                                                <DataTrigger Binding="{Binding Outcome}" Value="Lose">
+                                                                <DataTrigger Binding="{Binding Outcome}" Value="Loss">
                                                                     <Setter Property="Foreground" Value="Red"/>
                                                                 </DataTrigger>
                                                                 <DataTrigger Binding="{Binding Outcome}" Value="Draw">

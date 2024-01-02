@@ -38,8 +38,8 @@ namespace Cs2GlobalAdrTracker.ViewLogic
             {
                 case "Win":
                     return AdrRecord.Outcomes.Win;
-                case "Lose":
-                    return AdrRecord.Outcomes.Lose;
+                case "Loss":
+                    return AdrRecord.Outcomes.Loss;
                 case "Draw":
                     return AdrRecord.Outcomes.Draw;
                 default:
