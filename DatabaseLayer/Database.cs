@@ -105,7 +105,7 @@ namespace DatabaseLayer.DataLayer
                                 UnixTimestamp = dr.GetInt32(dr.GetOrdinal("timestamp")),
                                 Outcome = dr.GetInt32(dr.GetOrdinal("outcome")) switch
                                 {
-                                    1 => AdrRecord.Outcomes.Lose,
+                                    1 => AdrRecord.Outcomes.Loss,
                                     2 => AdrRecord.Outcomes.Win,
                                     3 => AdrRecord.Outcomes.Draw,
                                     _ => AdrRecord.Outcomes.Unknown
@@ -138,7 +138,7 @@ namespace DatabaseLayer.DataLayer
                                 UnixTimestamp = dr.GetInt32(dr.GetOrdinal("timestamp")),
                                 Outcome = dr.GetInt32(dr.GetOrdinal("outcome")) switch
                                 {
-                                    1 => AdrRecord.Outcomes.Lose,
+                                    1 => AdrRecord.Outcomes.Loss,
                                     2 => AdrRecord.Outcomes.Win,
                                     3 => AdrRecord.Outcomes.Draw,
                                     _ => AdrRecord.Outcomes.Unknown
@@ -161,7 +161,7 @@ namespace DatabaseLayer.DataLayer
             cmd.Parameters.AddWithValue("@t", adr.UnixTimestamp);
             switch (adr.Outcome)
             {
-                case AdrRecord.Outcomes.Lose:
+                case AdrRecord.Outcomes.Loss:
                     cmd.Parameters.AddWithValue("@o", 1);
                     break;
                 case AdrRecord.Outcomes.Win:
