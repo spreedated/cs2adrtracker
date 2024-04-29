@@ -1,10 +1,10 @@
 ﻿using DatabaseLayer.DataLayer;
 using DatabaseLayer.Models;
+using Microsoft.Data.Sqlite;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.SQLite;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -76,20 +76,20 @@ namespace UnitTests
 
             Assert.That(this.database._conn.State, Is.EqualTo(ConnectionState.Open));
 
-            using (SQLiteCommand cmd = this.database._conn.CreateCommand())
+            using (SqliteCommand cmd = this.database._conn.CreateCommand())
             {
                 cmd.CommandText = $"SELECT count(*) FROM sqlite_schema;";
 
                 Assert.That((long)cmd.ExecuteScalar(), Is.GreaterThanOrEqualTo(1));
             }
 
-            using (SQLiteCommand cmd = this.database._conn.CreateCommand())
+            using (SqliteCommand cmd = this.database._conn.CreateCommand())
             {
-                List<string> names = new();
+                List<string> names = [];
 
                 cmd.CommandText = $"SELECT name FROM sqlite_schema;";
 
-                using (SQLiteDataReader dr = cmd.ExecuteReader())
+                using (SqliteDataReader dr = cmd.ExecuteReader())
                 {
                     while (dr.Read())
                     {
@@ -110,14 +110,14 @@ namespace UnitTests
             Stopwatch sw = new();
 
             //# Batch ADR insert
-            List<AdrRecord> randomAdrs = new();
+            List<AdrRecord> randomAdrs = [];
 
             Assert.DoesNotThrow(() =>
             {
                 for (int i = 0; i < 1000; i++)
                 {
                     Random rnd = new(BitConverter.ToInt32(Guid.NewGuid().ToByteArray()));
-                    randomAdrs.Add(new() { Value = rnd.Next(20, 189), UnixTimestamp = DateTimeOffset.Now.ToUnixTimeSeconds() });
+                    randomAdrs.Add(new() { Value = rnd.Next(20, 189), Timestamp = DateTimeOffset.Now.ToUnixTimeSeconds() });
                 }
             });
 
@@ -128,7 +128,7 @@ namespace UnitTests
             Console.WriteLine($"Batch ADR insert time: \"{sw.Elapsed:mm\\:ss\\:ffffff}\"");
             sw.Reset();
 
-            using (SQLiteCommand cmd = this.database._conn.CreateCommand())
+            using (SqliteCommand cmd = this.database._conn.CreateCommand())
             {
                 cmd.CommandText = $"SELECT count(*) FROM adrs;";
 
@@ -144,7 +144,7 @@ namespace UnitTests
                 {
                     Random rnd = new(BitConverter.ToInt32(Guid.NewGuid().ToByteArray()));
 
-                    this.database.AddAdr(new AdrRecord() { Value = rnd.Next(20, 189), UnixTimestamp = DateTimeOffset.Now.ToUnixTimeSeconds() });
+                    this.database.AddAdr(new AdrRecord() { Value = rnd.Next(20, 189), Timestamp = DateTimeOffset.Now.ToUnixTimeSeconds() });
                 }
             });
             sw.Stop();
@@ -152,7 +152,7 @@ namespace UnitTests
             Console.WriteLine($"Single ADR insert time: \"{sw.Elapsed:mm\\:ss\\:ffffff}\"");
             sw.Reset();
 
-            using (SQLiteCommand cmd = this.database._conn.CreateCommand())
+            using (SqliteCommand cmd = this.database._conn.CreateCommand())
             {
                 cmd.CommandText = $"SELECT count(*) FROM adrs;";
 
@@ -166,14 +166,14 @@ namespace UnitTests
         {
             this.database = new(this.databaseTestFile);
 
-            List<AdrRecord> randomAdrs = new();
+            List<AdrRecord> randomAdrs = [];
 
             Assert.DoesNotThrow(() =>
             {
                 for (int i = 0; i < 1000; i++)
                 {
                     Random rnd = new(BitConverter.ToInt32(Guid.NewGuid().ToByteArray()));
-                    randomAdrs.Add(new() { Value = rnd.Next(20, 189), UnixTimestamp = DateTimeOffset.Now.ToUnixTimeSeconds() });
+                    randomAdrs.Add(new() { Value = rnd.Next(20, 189), Timestamp = DateTimeOffset.Now.ToUnixTimeSeconds() });
                 }
             });
 

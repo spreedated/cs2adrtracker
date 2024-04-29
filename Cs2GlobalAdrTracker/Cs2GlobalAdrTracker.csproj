@@ -10,7 +10,7 @@
     <SignAssembly>True</SignAssembly>
     <AssemblyOriginatorKeyFile>adrtracker.snk</AssemblyOriginatorKeyFile>
     <Authors>Markus Karl Wackermann</Authors>
-    <Version>1.0.3.1</Version>
+    <Version>1.0.4.0</Version>
     <AssemblyTitle>CS2 ADR Tracker</AssemblyTitle>
     <Title>CS2 ADR Tracker</Title>
     <ApplicationIcon>logo.ico</ApplicationIcon>
@@ -32,10 +32,10 @@
   <ItemGroup>
     <PackageReference Include="Hardcodet.NotifyIcon.Wpf" Version="1.1.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-    <PackageReference Include="Serilog" Version="3.0.1" />
-    <PackageReference Include="Serilog.Sinks.Console" Version="4.1.0" />
+    <PackageReference Include="Serilog" Version="3.1.1" />
+    <PackageReference Include="Serilog.Sinks.Console" Version="5.0.1" />
     <PackageReference Include="Serilog.Sinks.Debug" Version="2.0.0" />
-    <PackageReference Include="SharpVectors.Wpf" Version="1.8.1" />
+    <PackageReference Include="SharpVectors.Wpf" Version="1.8.4" />
   </ItemGroup>
 
   <ItemGroup>

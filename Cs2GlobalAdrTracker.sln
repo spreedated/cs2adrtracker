@@ -5,7 +5,7 @@ VisualStudioVersion = 17.7.34031.279
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cs2GlobalAdrTracker", "Cs2GlobalAdrTracker\Cs2GlobalAdrTracker.csproj", "{68AE9F6F-CD01-4F19-ADFE-FD3EF14647D7}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnitTests", "UnitTests\UnitTests.csproj", "{99F1B068-0F99-4A89-B7D3-B2F79F4C2ABA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DatabaseLayer.Tests", "DatabaseLayer.Tests\DatabaseLayer.Tests.csproj", "{99F1B068-0F99-4A89-B7D3-B2F79F4C2ABA}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DatabaseLayer", "DatabaseLayer\DatabaseLayer.csproj", "{D5C022F7-7367-4C8B-9158-7350860DD39E}"
 EndProject
