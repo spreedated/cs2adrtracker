@@ -1,10 +1,12 @@
 ﻿#pragma warning disable S1215
 #pragma warning disable S3881
 
+using Dapper;
 using DatabaseLayer.Models;
+using Microsoft.Data.Sqlite;
 using System;
 using System.Collections.Generic;
-using System.Data.SQLite;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using static DatabaseLayer.Logic.HelperFunctions;
@@ -14,7 +16,7 @@ namespace DatabaseLayer.DataLayer
     public class Database : IDisposable
     {
         private readonly string _databasePath;
-        internal SQLiteConnection _conn;
+        internal SqliteConnection _conn;
 
         #region Constructor
         /// <summary>
@@ -47,7 +49,7 @@ namespace DatabaseLayer.DataLayer
         {
             this.Open();
 
-            using (SQLiteCommand cmd = this._conn.CreateCommand())
+            using (SqliteCommand cmd = this._conn.CreateCommand())
             {
                 cmd.CommandText = LoadEmbeddedSql("CreateTableAdrs");
                 cmd.ExecuteNonQuery();
@@ -56,17 +58,37 @@ namespace DatabaseLayer.DataLayer
             this._conn.Close();
         }
 
+        private static DynamicParameters CreateInsertDynamicParameters(AdrRecord adr)
+        {
+            Dictionary<string, object> paramDictionary = new()
+                    {
+                        { "@v", adr.Value },
+                        { "@t", adr.Timestamp },
+                        { "@o", adr.Outcome switch
+                        {
+                            AdrRecord.Outcomes.Loss => 1,
+                            AdrRecord.Outcomes.Win => 2,
+                            AdrRecord.Outcomes.Draw => 3,
+                            _ => 0
+                        } }
+                    };
+
+            return new(paramDictionary);
+        }
+
         public void Open()
         {
             this.Close();
 
-            SQLiteConnectionStringBuilder b = new()
+            SqliteConnectionStringBuilder b = new()
             {
                 DataSource = this._databasePath,
                 Pooling = true
             };
 
             this._conn = new(b.ToString());
+            SQLitePCL.Batteries.Init();
+
             this._conn.Open();
         }
 
@@ -74,6 +96,34 @@ namespace DatabaseLayer.DataLayer
         {
             this._conn?.Close();
             this._conn?.Dispose();
+        }
+
+        public bool AddAdr(AdrRecord adr)
+        {
+            return this.AddAdr([adr]);
+        }
+
+        public bool AddAdr(IEnumerable<AdrRecord> adrs)
+        {
+            if (!adrs.Any(x => x.IsValid()))
+            {
+                return false;
+            }
+
+            int transCmdsCount = 0;
+
+            using (SqliteTransaction trans = this._conn.BeginTransaction())
+            {
+
+                foreach (AdrRecord a in adrs)
+                {
+                    transCmdsCount += this._conn.Execute("INSERT INTO adrs (value,timestamp,outcome) VALUES (@v,@t,@o);", CreateInsertDynamicParameters(a), trans);
+                }
+
+                trans.Commit();
+            }
+
+            return adrs.Count() == transCmdsCount;
         }
 
         /// <summary>
@@ -88,140 +138,12 @@ namespace DatabaseLayer.DataLayer
                 count = 1;
             }
 
-            using (SQLiteTransaction trans = this._conn.BeginTransaction())
-            {
-                using (SQLiteCommand cmd = this._conn.CreateCommand())
-                {
-                    cmd.CommandText = $"SELECT id,value,timestamp,outcome FROM adrs ORDER BY timestamp DESC LIMIT {count};";
-
-                    using (SQLiteDataReader dr = cmd.ExecuteReader())
-                    {
-                        while (dr.Read())
-                        {
-                            yield return new()
-                            {
-                                Id = dr.GetInt32(dr.GetOrdinal("id")),
-                                Value = dr.GetInt32(dr.GetOrdinal("value")),
-                                UnixTimestamp = dr.GetInt32(dr.GetOrdinal("timestamp")),
-                                Outcome = dr.GetInt32(dr.GetOrdinal("outcome")) switch
-                                {
-                                    1 => AdrRecord.Outcomes.Loss,
-                                    2 => AdrRecord.Outcomes.Win,
-                                    3 => AdrRecord.Outcomes.Draw,
-                                    _ => AdrRecord.Outcomes.Unknown
-                                }
-                            };
-                        }
-                    }
-                }
-
-                trans.Commit();
-            }
+            return this._conn.Query<AdrRecord>($"SELECT id,value,timestamp,outcome FROM adrs ORDER BY timestamp DESC LIMIT {count};");
         }
 
         public IEnumerable<AdrRecord> GetAdrs()
         {
-            using (SQLiteTransaction trans = this._conn.BeginTransaction())
-            {
-                using (SQLiteCommand cmd = this._conn.CreateCommand())
-                {
-                    cmd.CommandText = "SELECT id,value,timestamp,outcome FROM adrs;";
-
-                    using (SQLiteDataReader dr = cmd.ExecuteReader())
-                    {
-                        while (dr.Read())
-                        {
-                            yield return new()
-                            {
-                                Id = dr.GetInt32(dr.GetOrdinal("id")),
-                                Value = dr.GetInt32(dr.GetOrdinal("value")),
-                                UnixTimestamp = dr.GetInt32(dr.GetOrdinal("timestamp")),
-                                Outcome = dr.GetInt32(dr.GetOrdinal("outcome")) switch
-                                {
-                                    1 => AdrRecord.Outcomes.Loss,
-                                    2 => AdrRecord.Outcomes.Win,
-                                    3 => AdrRecord.Outcomes.Draw,
-                                    _ => AdrRecord.Outcomes.Unknown
-                                }
-                            };
-                        }
-                    }
-                }
-
-                trans.Commit();
-            }
-        }
-
-        private SQLiteCommand CreateInsertCommand(AdrRecord adr)
-        {
-            SQLiteCommand cmd = this._conn.CreateCommand();
-
-            cmd.CommandText = "INSERT INTO adrs (value,timestamp,outcome) VALUES (@v,@t,@o);";
-            cmd.Parameters.AddWithValue("@v", adr.Value);
-            cmd.Parameters.AddWithValue("@t", adr.UnixTimestamp);
-            switch (adr.Outcome)
-            {
-                case AdrRecord.Outcomes.Loss:
-                    cmd.Parameters.AddWithValue("@o", 1);
-                    break;
-                case AdrRecord.Outcomes.Win:
-                    cmd.Parameters.AddWithValue("@o", 2);
-                    break;
-                case AdrRecord.Outcomes.Draw:
-                    cmd.Parameters.AddWithValue("@o", 3);
-                    break;
-                default:
-                    cmd.Parameters.AddWithValue("@o", 0);
-                    break;
-            }
-
-            return cmd;
-        }
-
-        public bool AddAdr(AdrRecord adr)
-        {
-            if (!adr.IsValid())
-            {
-                return false;
-            }
-
-            using (SQLiteCommand cmd = this.CreateInsertCommand(adr))
-            {
-                return cmd.ExecuteNonQuery() >= 1;
-            }
-        }
-
-        public bool AddAdr(IEnumerable<AdrRecord> adrs)
-        {
-            if (!adrs.Any(x => x.IsValid()))
-            {
-                return false;
-            }
-
-            Queue<SQLiteCommand> cmds = new();
-
-            foreach (AdrRecord a in adrs)
-            {
-                cmds.Enqueue(this.CreateInsertCommand(a));
-            }
-
-            int cmdsCount = cmds.Count;
-            int transCmdsCount = 0;
-
-            using (SQLiteTransaction trans = this._conn.BeginTransaction())
-            {
-                for (int i = 0; i < cmdsCount; i++)
-                {
-                    SQLiteCommand cmd = cmds.Dequeue();
-                    cmd.Transaction = trans;
-
-                    transCmdsCount += cmd.ExecuteNonQuery();
-                }
-
-                trans.Commit();
-            }
-
-            return cmdsCount == transCmdsCount;
+            return this._conn.Query<AdrRecord>("SELECT id,value,timestamp,outcome FROM adrs;");
         }
 
         public void Dispose()
@@ -234,7 +156,7 @@ namespace DatabaseLayer.DataLayer
 
         protected virtual void Dispose(bool disposing)
         {
-            SQLiteConnection.ClearAllPools();
+            SqliteConnection.ClearAllPools();
             this._conn?.Close();
             this._conn?.Dispose();
         }

@@ -1,7 +1,15 @@
-﻿CREATE TABLE "adrs"
+﻿CREATE TABLE "outcomes"
 (
-	"id" INTEGER NOT NULL,
-	"value" INTEGER NOT NULL,
-	"timestamp" INTEGER,
+	"id"	INTEGER NOT NULL,
+	"name"	TEXT NOT NULL UNIQUE,
+	PRIMARY KEY("id" AUTOINCREMENT)
+);
+
+CREATE TABLE "adrs"
+(
+	"id"	INTEGER NOT NULL,
+	"value"	INTEGER NOT NULL,
+	"timestamp"	INTEGER,
+	"outcome"	INTEGER NOT NULL DEFAULT 0,
 	PRIMARY KEY("id" AUTOINCREMENT)
 );

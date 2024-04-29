@@ -46,7 +46,7 @@ namespace Cs2GlobalAdrTracker.ViewModels
 
             Task.Factory.StartNew(() =>
             {
-                if (!RuntimeStorage.Database.AddAdr(new AdrRecord() { Value = outadr, UnixTimestamp = DateTimeOffset.Now.ToUnixTimeSeconds(), Outcome = outcome }))
+                if (!RuntimeStorage.Database.AddAdr(new AdrRecord() { Value = outadr, Timestamp = DateTimeOffset.Now.ToUnixTimeSeconds(), Outcome = outcome }))
                 {
                     Log.Warning($"ADR value \"{outadr}\" NOT added to database due to being invalid");
                     return;
