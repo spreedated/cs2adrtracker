@@ -70,20 +70,20 @@ namespace UnitTests
         {
             this.database = new(this.databaseTestFile, false);
 
-            Assert.That(this.database._conn.State, Is.EqualTo(ConnectionState.Closed));
+            Assert.That(this.database.conn.State, Is.EqualTo(ConnectionState.Closed));
 
             this.database.Open();
 
-            Assert.That(this.database._conn.State, Is.EqualTo(ConnectionState.Open));
+            Assert.That(this.database.conn.State, Is.EqualTo(ConnectionState.Open));
 
-            using (SqliteCommand cmd = this.database._conn.CreateCommand())
+            using (SqliteCommand cmd = this.database.conn.CreateCommand())
             {
                 cmd.CommandText = $"SELECT count(*) FROM sqlite_schema;";
 
                 Assert.That((long)cmd.ExecuteScalar(), Is.GreaterThanOrEqualTo(1));
             }
 
-            using (SqliteCommand cmd = this.database._conn.CreateCommand())
+            using (SqliteCommand cmd = this.database.conn.CreateCommand())
             {
                 List<string> names = [];
 
@@ -128,7 +128,7 @@ namespace UnitTests
             Console.WriteLine($"Batch ADR insert time: \"{sw.Elapsed:mm\\:ss\\:ffffff}\"");
             sw.Reset();
 
-            using (SqliteCommand cmd = this.database._conn.CreateCommand())
+            using (SqliteCommand cmd = this.database.conn.CreateCommand())
             {
                 cmd.CommandText = $"SELECT count(*) FROM adrs;";
 
@@ -152,7 +152,7 @@ namespace UnitTests
             Console.WriteLine($"Single ADR insert time: \"{sw.Elapsed:mm\\:ss\\:ffffff}\"");
             sw.Reset();
 
-            using (SqliteCommand cmd = this.database._conn.CreateCommand())
+            using (SqliteCommand cmd = this.database.conn.CreateCommand())
             {
                 cmd.CommandText = $"SELECT count(*) FROM adrs;";
 
@@ -187,6 +187,20 @@ namespace UnitTests
                 Assert.That(getAdrs.Sum(x => x.Value), Is.EqualTo(randomAdrs.Sum(x => x.Value)));
                 Assert.That(getAdrs.Any(x => x.Id != default), Is.True);
             });
+        }
+
+        [Test]
+        public void AdrRecordTests()
+        {
+            AdrRecord r = new();
+
+            Assert.That(r.IsValid(), Is.False);
+            Assert.That(r.Validate(new(r)), Is.Not.Empty);
+
+            r.Value = 142;
+
+            Assert.That(r.IsValid(), Is.True);
+            Assert.That(r.Validate(new(r)), Is.Empty);
         }
 
         [TearDown]

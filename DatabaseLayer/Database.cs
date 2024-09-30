@@ -6,7 +6,6 @@ using DatabaseLayer.Models;
 using Microsoft.Data.Sqlite;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using static DatabaseLayer.Logic.HelperFunctions;
@@ -15,8 +14,8 @@ namespace DatabaseLayer.DataLayer
 {
     public class Database : IDisposable
     {
-        private readonly string _databasePath;
-        internal SqliteConnection _conn;
+        private readonly string databasePath;
+        internal SqliteConnection conn;
 
         #region Constructor
         /// <summary>
@@ -26,14 +25,14 @@ namespace DatabaseLayer.DataLayer
         /// <param name="autoOpenConnection">Auto open a connection</param>
         public Database(string dbFilepath, bool autoOpenConnection = true)
         {
-            this._databasePath = dbFilepath;
+            this.databasePath = dbFilepath;
 
             if (string.IsNullOrEmpty(dbFilepath))
             {
                 throw new ArgumentException("Filepath cannot be null or empty", nameof(dbFilepath));
             }
 
-            if (!File.Exists(this._databasePath))
+            if (!File.Exists(this.databasePath))
             {
                 this.CreateEmptyDatabase();
             }
@@ -48,14 +47,8 @@ namespace DatabaseLayer.DataLayer
         private void CreateEmptyDatabase()
         {
             this.Open();
-
-            using (SqliteCommand cmd = this._conn.CreateCommand())
-            {
-                cmd.CommandText = LoadEmbeddedSql("CreateTableAdrs");
-                cmd.ExecuteNonQuery();
-            }
-
-            this._conn.Close();
+            this.conn.Execute(LoadEmbeddedSql("CreateTableAdrs"));
+            this.conn.Close();
         }
 
         private static DynamicParameters CreateInsertDynamicParameters(AdrRecord adr)
@@ -82,20 +75,20 @@ namespace DatabaseLayer.DataLayer
 
             SqliteConnectionStringBuilder b = new()
             {
-                DataSource = this._databasePath,
+                DataSource = this.databasePath,
                 Pooling = true
             };
 
-            this._conn = new(b.ToString());
+            this.conn = new(b.ToString());
             SQLitePCL.Batteries.Init();
 
-            this._conn.Open();
+            this.conn.Open();
         }
 
         public void Close()
         {
-            this._conn?.Close();
-            this._conn?.Dispose();
+            this.conn?.Close();
+            this.conn?.Dispose();
         }
 
         public bool AddAdr(AdrRecord adr)
@@ -112,12 +105,11 @@ namespace DatabaseLayer.DataLayer
 
             int transCmdsCount = 0;
 
-            using (SqliteTransaction trans = this._conn.BeginTransaction())
+            using (SqliteTransaction trans = this.conn.BeginTransaction())
             {
-
                 foreach (AdrRecord a in adrs)
                 {
-                    transCmdsCount += this._conn.Execute("INSERT INTO adrs (value,timestamp,outcome) VALUES (@v,@t,@o);", CreateInsertDynamicParameters(a), trans);
+                    transCmdsCount += this.conn.Execute(LoadEmbeddedSql("AddAdr"), CreateInsertDynamicParameters(a), trans);
                 }
 
                 trans.Commit();
@@ -138,12 +130,12 @@ namespace DatabaseLayer.DataLayer
                 count = 1;
             }
 
-            return this._conn.Query<AdrRecord>($"SELECT id,value,timestamp,outcome FROM adrs ORDER BY timestamp DESC LIMIT {count};");
+            return this.conn.Query<AdrRecord>($"SELECT id,value,timestamp,outcome FROM adrs ORDER BY timestamp DESC LIMIT {count};");
         }
 
         public IEnumerable<AdrRecord> GetAdrs()
         {
-            return this._conn.Query<AdrRecord>("SELECT id,value,timestamp,outcome FROM adrs;");
+            return this.conn.Query<AdrRecord>("SELECT id,value,timestamp,outcome FROM adrs;");
         }
 
         public void Dispose()
@@ -157,8 +149,8 @@ namespace DatabaseLayer.DataLayer
         protected virtual void Dispose(bool disposing)
         {
             SqliteConnection.ClearAllPools();
-            this._conn?.Close();
-            this._conn?.Dispose();
+            this.conn?.Close();
+            this.conn?.Dispose();
         }
     }
 }

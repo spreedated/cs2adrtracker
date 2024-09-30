@@ -1,8 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
 
 namespace DatabaseLayer.Models
 {
-    public record AdrRecord
+    public sealed record AdrRecord : IValidatableObject
     {
         public enum Outcomes
         {
@@ -20,7 +23,19 @@ namespace DatabaseLayer.Models
 
         public bool IsValid()
         {
-            return this.Value != default && this.Timestamp != default;
+            return !this.Validate(null).Any();
+        }
+
+        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+        {
+            List<ValidationResult> results = [];
+
+            if (this.Value == default)
+            {
+                results.Add(new ValidationResult("Value must be set.", [ nameof(this.Value) ]));
+            }
+
+            return results;
         }
     }
 }
