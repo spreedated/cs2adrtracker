@@ -10,7 +10,7 @@ namespace Cs2GlobalAdrTracker
     public partial class App : Application
     {
         private readonly static LogEventLevel level = LogEventLevel.Verbose;
-        private readonly static string configPath = Path.Combine(Path.GetDirectoryName(typeof(App).Assembly.Location), "config.json");
+        private readonly static string configPath = Path.Combine(Path.GetDirectoryName(Environment.CurrentDirectory), "config.json");
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
