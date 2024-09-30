@@ -26,7 +26,8 @@
         SizeToContent="Height"
         Icon="pack://application:,,,/Resources/logo_512x512.png"
         ShowInTaskbar="False"
-        Loaded="Window_Loaded">
+        Loaded="Window_Loaded"
+        Title="{Binding WindowTitle, Mode=OneWay}">
 
     <Window.DataContext>
         <vm:MainWindowViewModel/>
@@ -78,37 +79,15 @@
 
                     <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Center">
                         <Label Style="{StaticResource LabelStandard}" HorizontalAlignment="Right" Content="Add new ADR:" Margin="0,0,4,0"/>
-                        <TextBox Text="{Binding InputAdr, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" MinWidth="36" MaxLength="3">
+                        <TextBox Text="{Binding InputAdr, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={vl:TextboxAllowDigitsOnly}}" MinWidth="36" MaxLength="3">
                             <TextBox.InputBindings>
                                 <KeyBinding Key="Return" Command="{Binding AddCommand}" CommandParameter="{Binding Instance}"/>
                             </TextBox.InputBindings>
                         </TextBox>
-                        <ComboBox x:Name="CMB_Outcome" Margin="8,0,0,0" Width="64" SelectedItem="{Binding Outcome, Converter={vl:StringToOutcomeConverter}}">
-                            <ComboBoxItem Content="None" IsSelected="True"/>
-                            <ComboBoxItem Content="Win"/>
-                            <ComboBoxItem Content="Loss"/>
-                            <ComboBoxItem Content="Draw"/>
-                        </ComboBox>
+                        <ComboBox Margin="8,0,0,0" Width="64" ItemsSource="{Binding OutcomeList, Mode=OneWay}" SelectedItem="{Binding Outcome}"/>
                     </StackPanel>
 
-                    <Button Grid.Row="1" HorizontalAlignment="Center" Margin="0,8,0,0" Padding="8,2,8,2" Content="Add" d:Visibility="Visible" Command="{Binding AddCommand}" CommandParameter="{Binding Instance}">
-                        <Button.Style>
-                            <Style BasedOn="{StaticResource ButtonStandard}" TargetType="Button">
-                                <Style.Triggers>
-                                    <MultiDataTrigger>
-                                        <MultiDataTrigger.Conditions>
-                                            <Condition Binding="{Binding HasLength}" Value="True"/>
-                                            <Condition Binding="{Binding IsInputNumeric}" Value="True"/>
-                                        </MultiDataTrigger.Conditions>
-
-                                        <Setter Property="Visibility" Value="Visible"/>
-                                    </MultiDataTrigger>
-                                </Style.Triggers>
-
-                                <Setter Property="Visibility" Value="Collapsed"/>
-                            </Style>
-                        </Button.Style>
-                    </Button>
+                    <Button Grid.Row="1" HorizontalAlignment="Center" Margin="0,8,0,0" Padding="8,2,8,2" Content="Add" Visibility="{Binding IsAddButtonVisible, Converter={vl:BoolToVisibilityConverter}}" d:Visibility="Visible" Command="{Binding AddCommand}"/>
                 </Grid>
             </StackPanel>
 

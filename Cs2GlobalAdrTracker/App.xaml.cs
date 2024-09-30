@@ -26,12 +26,12 @@ namespace Cs2GlobalAdrTracker
 
             Log.Debug($"Logger created @ {DateTime.Now:G}");
 
-            RuntimeStorage.Configuration = new(new(configPath));
-            RuntimeStorage.Configuration.Load();
+            Globals.Configuration = new(new(configPath));
+            Globals.Configuration.Load();
 
             Log.Verbose("Configuration loaded");
 
-            RuntimeStorage.Database = new(RuntimeStorage.Configuration.RuntimeConfiguration.DatabaseFile);
+            Globals.Database = new(Globals.Configuration.RuntimeConfiguration.DatabaseFile);
 
             Log.Verbose("Database connection established");
         }

@@ -1,4 +1,6 @@
-﻿using Cs2GlobalAdrTracker.Logic;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using Cs2GlobalAdrTracker.Logic;
 using Cs2GlobalAdrTracker.Views;
 using DatabaseLayer.Models;
 using Hardcodet.Wpf.TaskbarNotification;
@@ -8,158 +10,121 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
 namespace Cs2GlobalAdrTracker.ViewModels
 {
-    public class MainWindowViewModel : ViewModelBase
+    public partial class MainWindowViewModel : ObservableObject
     {
         internal TaskbarIcon taskbarIcon;
 
+        [ObservableProperty]
+        private string windowTitle;
+
+        [ObservableProperty]
+        [NotifyCanExecuteChangedFor(nameof(this.AddCommand))]
+        private AdrRecord.Outcomes outcome;
+
+        [ObservableProperty]
+        private AdrRecord.Outcomes[] outcomeList = Enum.GetValues<AdrRecord.Outcomes>();
+
+        [ObservableProperty]
+        private ObservableCollection<AdrRecord> last10Records;
+
+        [ObservableProperty]
+        private float last10Average;
+
+        [ObservableProperty]
+        private ContextMenu contextMenuTaskbar;
+
+        [ObservableProperty]
+        private MainWindow instance;
+
+        [ObservableProperty]
+        private float currentAdr;
+
+        [ObservableProperty]
+        private int trackedGamesCount;
+
+        [ObservableProperty]
+        [NotifyCanExecuteChangedFor(nameof(this.AddCommand))]
+        private string inputAdr;
+
+        [ObservableProperty]
+        private bool isAddButtonVisible; 
+
+        #region Constructor
         public MainWindowViewModel()
         {
+            this.WindowTitle = typeof(MainWindowViewModel).Assembly.GetCustomAttribute<AssemblyTitleAttribute>()?.Title;
+
             this.taskbarIcon = new()
             {
 #pragma warning disable S1075
                 IconSource = new BitmapImage(new Uri(@"pack://application:,,,/Resources/logo.ico", UriKind.Absolute))
 #pragma warning restore S1075
             };
-        }
 
-        public ICommand AddCommand { get; } = new RelayCommand<MainWindow>((w) =>
+            Task.Run(async () =>
+            { 
+                await this.RefreshData();
+            });
+        }
+        #endregion
+
+        [RelayCommand(CanExecute = nameof(CanAdd))]
+        private async Task Add()
         {
-            if (!int.TryParse(((MainWindowViewModel)w.DataContext).InputAdr, out int outadr))
+            if (!int.TryParse(this.InputAdr, out int outadr))
             {
-                Log.Warning($"Invalid adr provided \"{((MainWindowViewModel)w.DataContext).InputAdr}\"");
+                Log.Warning("Invalid adr provided \"{InputAdr}\"", this.InputAdr);
                 return;
             }
 
-            AdrRecord.Outcomes outcome = ((MainWindowViewModel)w.DataContext).Outcome;
-
-            ((MainWindowViewModel)w.DataContext).InputAdr = null;
-            w.ResetOutcomeComboBox();
-
-            Task.Factory.StartNew(() =>
+            await Task.Run(() =>
             {
-                if (!RuntimeStorage.Database.AddAdr(new AdrRecord() { Value = outadr, Timestamp = DateTimeOffset.Now.ToUnixTimeSeconds(), Outcome = outcome }))
+                if (!Globals.Database.AddAdr(new AdrRecord() { Value = outadr, Timestamp = DateTimeOffset.Now.ToUnixTimeSeconds(), Outcome = this.Outcome }))
                 {
-                    Log.Warning($"ADR value \"{outadr}\" NOT added to database due to being invalid");
+                    Log.Warning("ADR value \"{Outadr}\" NOT added to database due to being invalid", outadr);
                     return;
                 }
 
-                Log.Information($"ADR value \"{outadr}\" (Outcome: \"{outcome}\") added to database");
-
-                w.Dispatcher.Invoke(() =>
-                {
-                    ((MainWindowViewModel)w.DataContext).RefreshData();
-                });
+                Log.Information("ADR value \"{Outadr}\" (Outcome: \"{Outcome}\") added to database", outadr, this.Outcome.ToString());
             });
-        });
 
-        public void RefreshData()
+            await this.RefreshData();
+            this.InputAdr = default;
+            this.Outcome = default;
+        }
+
+        private bool CanAdd()
         {
-            Task.Factory.StartNew(() =>
+            bool res = (this.InputAdr != null && this.InputAdr.Length > 0) && this.Outcome != default;
+
+            this.IsAddButtonVisible = res;
+            return res;
+        }
+
+        public async Task RefreshData()
+        {
+            await Task.Run(() =>
             {
-                IEnumerable<AdrRecord> adrs = RuntimeStorage.Database.GetAdrs();
+                IEnumerable<AdrRecord> adrs = Globals.Database.GetAdrs();
 
                 this.CurrentAdr = adrs.Any() ? (float)adrs.Average(x => x.Value) : 0f;
                 this.TrackedGamesCount = adrs.Any() ? adrs.Count() : 0;
-                this.Last10Records = new(RuntimeStorage.Database.GetLast());
+                this.Last10Records = new(Globals.Database.GetLast());
                 this.Last10Average = this.Last10Records.Any() ? (float)this.Last10Records.Average(x => x.Value) : 0f;
-
-                Log.Information("Data refreshed");
             });
-        }
 
-        private AdrRecord.Outcomes _Outcome;
-        public AdrRecord.Outcomes Outcome
-        {
-            get
-            {
-                return this._Outcome;
-            }
-            set
-            {
-                this._Outcome = value;
-                base.OnPropertyChanged(nameof(this.Outcome));
-            }
-        }
+            base.OnPropertyChanged(nameof(this.IndicatorBrush));
 
-        private ObservableCollection<AdrRecord> _Last10Records;
-        public ObservableCollection<AdrRecord> Last10Records
-        {
-            get
-            {
-                return this._Last10Records;
-            }
-            set
-            {
-                this._Last10Records = value;
-                base.OnPropertyChanged(nameof(this.Last10Records));
-            }
-        }
-
-        private float _Last10Average;
-        public float Last10Average
-        {
-            get
-            {
-                return this._Last10Average;
-            }
-            set
-            {
-                this._Last10Average = value;
-                base.OnPropertyChanged(nameof(this.Last10Average));
-            }
-        }
-
-        private ContextMenu _ContextMenuTaskbar;
-        public ContextMenu ContextMenuTaskbar
-        {
-            get
-            {
-                return this._ContextMenuTaskbar;
-            }
-            set
-            {
-                this._ContextMenuTaskbar = value;
-                base.OnPropertyChanged(nameof(this.ContextMenuTaskbar));
-                this.taskbarIcon.ContextMenu = value;
-            }
-        }
-
-        private Window _Instance;
-        public Window Instance
-        {
-            get
-            {
-                return this._Instance;
-            }
-            set
-            {
-                this._Instance = value;
-                base.OnPropertyChanged(nameof(this.Instance));
-            }
-        }
-
-        private float _CurrentAdr;
-        public float CurrentAdr
-        {
-            get
-            {
-                return this._CurrentAdr;
-            }
-            set
-            {
-                this._CurrentAdr = value;
-                base.OnPropertyChanged(nameof(this.CurrentAdr));
-                base.OnPropertyChanged(nameof(this.IndicatorBrush));
-            }
+            Log.Verbose("Data refreshed");
         }
 
         public Brush IndicatorBrush
@@ -180,52 +145,6 @@ namespace Cs2GlobalAdrTracker.ViewModels
                 }
 
                 return Brushes.Black;
-            }
-        }
-
-        private int _TrackedGamesCount;
-        public int TrackedGamesCount
-        {
-            get
-            {
-                return this._TrackedGamesCount;
-            }
-            set
-            {
-                this._TrackedGamesCount = value;
-                base.OnPropertyChanged(nameof(this.TrackedGamesCount));
-            }
-        }
-
-        private string _InputAdr;
-        public string InputAdr
-        {
-            get
-            {
-                return this._InputAdr;
-            }
-            set
-            {
-                this._InputAdr = value;
-                base.OnPropertyChanged(nameof(this.InputAdr));
-                base.OnPropertyChanged(nameof(this.IsInputNumeric));
-                base.OnPropertyChanged(nameof(this.HasLength));
-            }
-        }
-
-        public bool IsInputNumeric
-        {
-            get
-            {
-                return int.TryParse(this.InputAdr, out _);
-            }
-        }
-
-        public bool HasLength
-        {
-            get
-            {
-                return this.InputAdr != null && this.InputAdr.Length > 0;
             }
         }
 

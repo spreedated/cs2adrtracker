@@ -1,9 +1,7 @@
 ﻿using Cs2GlobalAdrTracker.Logic;
 using Cs2GlobalAdrTracker.ViewModels;
-using DatabaseLayer.Models;
 using Serilog;
 using System;
-using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Controls;
@@ -30,8 +28,6 @@ namespace Cs2GlobalAdrTracker.Views
             this.InitializeComponent();
             ((MainWindowViewModel)this.DataContext).Instance = this;
 
-            this.Title = typeof(MainWindow).Assembly.GetCustomAttribute<AssemblyTitleAttribute>()?.Title;
-
             ContextMenu s = new();
             MenuItem mm = new() { Header = "Exit", Foreground = Brushes.Black };
             mm.Click += (o, e) => { this.Close(); };
@@ -39,15 +35,14 @@ namespace Cs2GlobalAdrTracker.Views
 
             this.ContextMenu = s;
             ((MainWindowViewModel)this.DataContext).ContextMenuTaskbar = s;
-            ((MainWindowViewModel)this.DataContext).RefreshData();
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            if (RuntimeStorage.Configuration.RuntimeConfiguration.WindowStartupLocation != null)
+            if (Globals.Configuration.RuntimeConfiguration.WindowStartupLocation != null)
             {
-                this.Left = RuntimeStorage.Configuration.RuntimeConfiguration.WindowStartupLocation.X;
-                this.Top = RuntimeStorage.Configuration.RuntimeConfiguration.WindowStartupLocation.Y;
+                this.Left = Globals.Configuration.RuntimeConfiguration.WindowStartupLocation.X;
+                this.Top = Globals.Configuration.RuntimeConfiguration.WindowStartupLocation.Y;
             }
             else
             {
@@ -66,19 +61,19 @@ namespace Cs2GlobalAdrTracker.Views
             if (e.ChangedButton == MouseButton.Left)
             {
                 this.DragMove();
-                if (RuntimeStorage.Configuration.RuntimeConfiguration.WindowStartupLocation == null)
+                if (Globals.Configuration.RuntimeConfiguration.WindowStartupLocation == null)
                 {
-                    RuntimeStorage.Configuration.RuntimeConfiguration.WindowStartupLocation = new();
+                    Globals.Configuration.RuntimeConfiguration.WindowStartupLocation = new();
                 }
 
-                RuntimeStorage.Configuration.RuntimeConfiguration.WindowStartupLocation = new()
+                Globals.Configuration.RuntimeConfiguration.WindowStartupLocation = new()
                 {
                     X = this.Left,
                     Y = this.Top
                 };
-                RuntimeStorage.Configuration.Save();
+                Globals.Configuration.Save();
 
-                Log.Verbose($"Window relocated to coords:\nX: {this.Left}\nY: {this.Top}");
+                Log.Verbose("Window relocated to coords:\nX: {Left}\nY: {Top}", this.Left, this.Top);
             }
         }
 
@@ -86,11 +81,6 @@ namespace Cs2GlobalAdrTracker.Views
         {
             Log.Verbose("Window closing");
             ((MainWindowViewModel)this.DataContext)?.DisposeNotifyIcon();
-        }
-
-        public void ResetOutcomeComboBox()
-        {
-            this.CMB_Outcome.SelectedIndex = 0;
         }
     }
 }
