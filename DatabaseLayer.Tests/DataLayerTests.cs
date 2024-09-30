@@ -70,20 +70,20 @@ namespace UnitTests
         {
             this.database = new(this.databaseTestFile, false);
 
-            Assert.That(this.database._conn.State, Is.EqualTo(ConnectionState.Closed));
+            Assert.That(this.database.conn.State, Is.EqualTo(ConnectionState.Closed));
 
             this.database.Open();
 
-            Assert.That(this.database._conn.State, Is.EqualTo(ConnectionState.Open));
+            Assert.That(this.database.conn.State, Is.EqualTo(ConnectionState.Open));
 
-            using (SqliteCommand cmd = this.database._conn.CreateCommand())
+            using (SqliteCommand cmd = this.database.conn.CreateCommand())
             {
                 cmd.CommandText = $"SELECT count(*) FROM sqlite_schema;";
 
                 Assert.That((long)cmd.ExecuteScalar(), Is.GreaterThanOrEqualTo(1));
             }
 
-            using (SqliteCommand cmd = this.database._conn.CreateCommand())
+            using (SqliteCommand cmd = this.database.conn.CreateCommand())
             {
                 List<string> names = [];
 
@@ -128,7 +128,7 @@ namespace UnitTests
             Console.WriteLine($"Batch ADR insert time: \"{sw.Elapsed:mm\\:ss\\:ffffff}\"");
             sw.Reset();
 
-            using (SqliteCommand cmd = this.database._conn.CreateCommand())
+            using (SqliteCommand cmd = this.database.conn.CreateCommand())
             {
                 cmd.CommandText = $"SELECT count(*) FROM adrs;";
 
@@ -152,7 +152,7 @@ namespace UnitTests
             Console.WriteLine($"Single ADR insert time: \"{sw.Elapsed:mm\\:ss\\:ffffff}\"");
             sw.Reset();
 
-            using (SqliteCommand cmd = this.database._conn.CreateCommand())
+            using (SqliteCommand cmd = this.database.conn.CreateCommand())
             {
                 cmd.CommandText = $"SELECT count(*) FROM adrs;";
 
@@ -187,6 +187,86 @@ namespace UnitTests
                 Assert.That(getAdrs.Sum(x => x.Value), Is.EqualTo(randomAdrs.Sum(x => x.Value)));
                 Assert.That(getAdrs.Any(x => x.Id != default), Is.True);
             });
+        }
+
+        [Test]
+        public void DeleteRecordTests()
+        {
+            this.database = new(this.databaseTestFile);
+
+            List<AdrRecord> randomAdrs = [];
+
+            Assert.DoesNotThrow(() =>
+            {
+                for (int i = 0; i < 1000; i++)
+                {
+                    Random rnd = new(BitConverter.ToInt32(Guid.NewGuid().ToByteArray()));
+                    randomAdrs.Add(new() { Value = rnd.Next(20, 189), Timestamp = DateTimeOffset.Now.ToUnixTimeSeconds(), Outcome = (AdrRecord.Outcomes)rnd.Next(1,4) });
+                }
+            });
+
+            Assert.That(this.database.AddAdr(randomAdrs), Is.True);
+            Assert.That(this.database.GetAdrs().Count(), Is.EqualTo(1000));
+
+            Assert.DoesNotThrow(() =>
+            {
+                List<int> pickedIds = [];
+
+                for (int i = 0; i < 256; i++)
+                {
+                    Random rnd = new(BitConverter.ToInt32(Guid.NewGuid().ToByteArray()));
+                    int pickedId = rnd.Next(1, 1001);
+
+                    while (pickedIds.Contains(pickedId))
+                    {
+                        pickedId = rnd.Next(1, 1001);
+                    }
+                    
+                    pickedIds.Add(pickedId);
+                    this.database.DeleteAdr(pickedIds[^1]);
+                }
+            });
+
+            Assert.That(this.database.GetAdrs().Count(), Is.EqualTo(744));
+        }
+
+        [Test]
+        public void GetStatisticTests()
+        {
+            this.database = new(this.databaseTestFile);
+
+            List<AdrRecord> randomAdrs = [];
+
+            Assert.DoesNotThrow(() =>
+            {
+                for (int i = 0; i < 1000; i++)
+                {
+                    Random rnd = new(BitConverter.ToInt32(Guid.NewGuid().ToByteArray()));
+                    randomAdrs.Add(new() { Value = rnd.Next(20, 189), Timestamp = DateTimeOffset.Now.ToUnixTimeSeconds(), Outcome = (AdrRecord.Outcomes)rnd.Next(1, 4) });
+                }
+            });
+
+            Assert.That(this.database.AddAdr(randomAdrs), Is.True);
+            Assert.That(this.database.GetAdrs().Count(), Is.EqualTo(1000));
+
+            Statistic s = this.database.GetStatistic();
+
+            Assert.That(s, Is.Not.Null);
+            Assert.That(s.Wins + s.Losses + s.Draws, Is.EqualTo(1000));
+        }
+
+        [Test]
+        public void AdrRecordTests()
+        {
+            AdrRecord r = new();
+
+            Assert.That(r.IsValid(), Is.False);
+            Assert.That(r.Validate(new(r)), Is.Not.Empty);
+
+            r.Value = 142;
+
+            Assert.That(r.IsValid(), Is.True);
+            Assert.That(r.Validate(new(r)), Is.Empty);
         }
 
         [TearDown]

@@ -1,0 +1,1 @@
+﻿DELETE FROM adrs WHERE id = @id;

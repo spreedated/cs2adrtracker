@@ -4,7 +4,7 @@ using neXn.Lib.ConfigurationHandler;
 
 namespace Cs2GlobalAdrTracker.Logic
 {
-    internal static class RuntimeStorage
+    internal static class Globals
     {
         internal static ConfigurationHandler<Configuration> Configuration { get; set; }
         internal static Database Database { get; set; }
