@@ -12,7 +12,6 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
-using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -56,7 +55,10 @@ namespace Cs2GlobalAdrTracker.ViewModels
         private string inputAdr;
 
         [ObservableProperty]
-        private bool isAddButtonVisible; 
+        private bool isAddButtonVisible;
+
+        [ObservableProperty]
+        private Statistic statistic;
 
         #region Constructor
         public MainWindowViewModel()
@@ -71,7 +73,7 @@ namespace Cs2GlobalAdrTracker.ViewModels
             };
 
             Task.Run(async () =>
-            { 
+            {
                 await this.RefreshData();
             });
         }
@@ -110,6 +112,13 @@ namespace Cs2GlobalAdrTracker.ViewModels
             return res;
         }
 
+        [RelayCommand]
+        private async Task Delete(int adrId)
+        {
+            Globals.Database.DeleteAdr(adrId);
+            await this.RefreshData();
+        }
+
         public async Task RefreshData()
         {
             await Task.Run(() =>
@@ -120,6 +129,7 @@ namespace Cs2GlobalAdrTracker.ViewModels
                 this.TrackedGamesCount = adrs.Any() ? adrs.Count() : 0;
                 this.Last10Records = new(Globals.Database.GetLast());
                 this.Last10Average = this.Last10Records.Any() ? (float)this.Last10Records.Average(x => x.Value) : 0f;
+                this.Statistic = Globals.Database.GetStatistic();
             });
 
             base.OnPropertyChanged(nameof(this.IndicatorBrush));

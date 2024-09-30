@@ -118,6 +118,16 @@ namespace DatabaseLayer.DataLayer
             return adrs.Count() == transCmdsCount;
         }
 
+        public bool DeleteAdr(int id)
+        {
+            return this.conn.Execute(LoadEmbeddedSql("DeleteAdr"), new { id }) == 1;
+        }
+
+        public Statistic GetStatistic()
+        {
+            return this.conn.QueryFirst<Statistic>(LoadEmbeddedSql("GetStatistic"));
+        }
+
         /// <summary>
         /// Get the last # of records
         /// </summary>

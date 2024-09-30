@@ -32,7 +32,7 @@ namespace DatabaseLayer.Models
 
             if (this.Value == default)
             {
-                results.Add(new ValidationResult("Value must be set.", [ nameof(this.Value) ]));
+                results.Add(new ValidationResult("Value must be set.", [nameof(this.Value)]));
             }
 
             return results;

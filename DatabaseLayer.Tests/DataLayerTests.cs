@@ -190,6 +190,72 @@ namespace UnitTests
         }
 
         [Test]
+        public void DeleteRecordTests()
+        {
+            this.database = new(this.databaseTestFile);
+
+            List<AdrRecord> randomAdrs = [];
+
+            Assert.DoesNotThrow(() =>
+            {
+                for (int i = 0; i < 1000; i++)
+                {
+                    Random rnd = new(BitConverter.ToInt32(Guid.NewGuid().ToByteArray()));
+                    randomAdrs.Add(new() { Value = rnd.Next(20, 189), Timestamp = DateTimeOffset.Now.ToUnixTimeSeconds(), Outcome = (AdrRecord.Outcomes)rnd.Next(1,4) });
+                }
+            });
+
+            Assert.That(this.database.AddAdr(randomAdrs), Is.True);
+            Assert.That(this.database.GetAdrs().Count(), Is.EqualTo(1000));
+
+            Assert.DoesNotThrow(() =>
+            {
+                List<int> pickedIds = [];
+
+                for (int i = 0; i < 256; i++)
+                {
+                    Random rnd = new(BitConverter.ToInt32(Guid.NewGuid().ToByteArray()));
+                    int pickedId = rnd.Next(1, 1001);
+
+                    while (pickedIds.Contains(pickedId))
+                    {
+                        pickedId = rnd.Next(1, 1001);
+                    }
+                    
+                    pickedIds.Add(pickedId);
+                    this.database.DeleteAdr(pickedIds[^1]);
+                }
+            });
+
+            Assert.That(this.database.GetAdrs().Count(), Is.EqualTo(744));
+        }
+
+        [Test]
+        public void GetStatisticTests()
+        {
+            this.database = new(this.databaseTestFile);
+
+            List<AdrRecord> randomAdrs = [];
+
+            Assert.DoesNotThrow(() =>
+            {
+                for (int i = 0; i < 1000; i++)
+                {
+                    Random rnd = new(BitConverter.ToInt32(Guid.NewGuid().ToByteArray()));
+                    randomAdrs.Add(new() { Value = rnd.Next(20, 189), Timestamp = DateTimeOffset.Now.ToUnixTimeSeconds(), Outcome = (AdrRecord.Outcomes)rnd.Next(1, 4) });
+                }
+            });
+
+            Assert.That(this.database.AddAdr(randomAdrs), Is.True);
+            Assert.That(this.database.GetAdrs().Count(), Is.EqualTo(1000));
+
+            Statistic s = this.database.GetStatistic();
+
+            Assert.That(s, Is.Not.Null);
+            Assert.That(s.Wins + s.Losses + s.Draws, Is.EqualTo(1000));
+        }
+
+        [Test]
         public void AdrRecordTests()
         {
             AdrRecord r = new();

@@ -10,6 +10,7 @@
         xmlns:m="clr-namespace:DatabaseLayer.Models;assembly=DatabaseLayer"
         xmlns:svgc="http://sharpvectors.codeplex.com/svgc/"
         xmlns:behaviors="http://schemas.microsoft.com/xaml/behaviors"
+        xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
         mc:Ignorable="d"
         MinHeight="142"
         MinWidth="220"
@@ -53,12 +54,16 @@
             </StackPanel>
 
             <Grid Grid.Row="1" Margin="8">
+                <Grid.RowDefinitions>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition/>
                     <ColumnDefinition/>
                 </Grid.ColumnDefinitions>
                 
-                <TextBlock Style="{StaticResource TextBlockStandard}" Grid.Column="0" Grid.ColumnSpan="2" d:Text=" Current ADR: ##&#xA;Tracked games: ##" FontFamily="{StaticResource Stratum}" HorizontalAlignment="Center">
+                <TextBlock Grid.Column="0" Grid.ColumnSpan="2" d:Text=" Current ADR: ##&#xA;Tracked games: ##" HorizontalAlignment="Center">
                     <TextBlock.Text>
                         <MultiBinding StringFormat="{}   Current ADR: {0:#.##} &#xA;Tracked games: {1}">
                             <Binding Path="CurrentAdr"/>
@@ -68,9 +73,17 @@
                 </TextBlock>
 
                 <Border Grid.Column="1" CornerRadius="2" HorizontalAlignment="Right" Margin="0,0,18,0" Width="{StaticResource IndicatorDotSize}" Height="{StaticResource IndicatorDotSize}" Background="{Binding IndicatorBrush}" />
+
+                <StackPanel Grid.Row="1" Grid.ColumnSpan="2" Orientation="Horizontal" HorizontalAlignment="Center">
+                    <TextBlock d:Text="777" Text="{Binding Statistic.Wins}" Foreground="Green" FontWeight="Bold" />
+                    <TextBlock Text=" / "/>
+                    <TextBlock d:Text="777" Text="{Binding Statistic.Draws}" Foreground="Yellow" FontWeight="Bold"/>
+                    <TextBlock Text=" / "/>
+                    <TextBlock d:Text="777" Text="{Binding Statistic.Losses}" Foreground="Red" FontWeight="Bold"/>
+                </StackPanel>
             </Grid>
 
-            <StackPanel Grid.Row="2" Margin="8">
+            <StackPanel Grid.Row="2" Margin="0,0,0,8">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition/>
@@ -78,7 +91,7 @@
                     </Grid.RowDefinitions>
 
                     <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Center">
-                        <Label Style="{StaticResource LabelStandard}" HorizontalAlignment="Right" Content="Add new ADR:" Margin="0,0,4,0"/>
+                        <Label HorizontalAlignment="Right" Content="Add new ADR:" Margin="0,0,4,0"/>
                         <TextBox Text="{Binding InputAdr, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={vl:TextboxAllowDigitsOnly}}" MinWidth="36" MaxLength="3">
                             <TextBox.InputBindings>
                                 <KeyBinding Key="Return" Command="{Binding AddCommand}" CommandParameter="{Binding Instance}"/>
@@ -91,7 +104,7 @@
                 </Grid>
             </StackPanel>
 
-            <Grid Grid.Row="3" Margin="20,0,20,8">
+            <Grid Grid.Row="3" Margin="5,0,5,8">
                 <Expander ExpandDirection="Down" d:IsExpanded="True" HorizontalAlignment="Center" MinWidth="180">
                     <Expander.Header>
                         <StackPanel>
@@ -102,9 +115,9 @@
                         <ListView d:ItemsSource="{d:SampleData}" ItemsSource="{Binding Last10Records}" BorderThickness="0">
                             <ListView.View>
                                 <GridView AllowsColumnReorder="False">
-                                    <GridViewColumn DisplayMemberBinding="{Binding DateTime, StringFormat={}{0:dd.MM.yy - HH:mm}, ConverterCulture=de-DE}" Header="Date" Width="90"/>
+                                    <GridViewColumn DisplayMemberBinding="{Binding DateTime, StringFormat={}{0:dd.MM.yy - HH:mm}, ConverterCulture=de-DE}" Header="Date" Width="92"/>
                                     <GridViewColumn DisplayMemberBinding="{Binding Value}" Header="ADR" Width="30"/>
-                                    <GridViewColumn  Header="Outcome" Width="52">
+                                    <GridViewColumn Header="Result" Width="36">
                                         <GridViewColumn.CellTemplate>
                                             <DataTemplate DataType="{x:Type m:AdrRecord}">
                                                 <TextBlock Text="{Binding Outcome}">
@@ -124,6 +137,19 @@
                                                         </Style>
                                                     </TextBlock.Style>
                                                 </TextBlock>
+                                            </DataTemplate>
+                                        </GridViewColumn.CellTemplate>
+                                    </GridViewColumn>
+                                    <GridViewColumn Width="32">
+                                        <GridViewColumn.CellTemplate>
+                                            <DataTemplate DataType="{x:Type m:AdrRecord}">
+                                                <Grid>
+                                                    <Button Style="{StaticResource DeleteIcon}" Command="{Binding DataContext.DeleteCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding Id}">
+                                                        <Button.Content>
+                                                            <iconPacks:Ionicons x:Name="DeleteButtonIcon" Kind="CloseCircleOutlineiOS" Width="12" Height="12"/>
+                                                        </Button.Content>
+                                                    </Button>
+                                                </Grid>
                                             </DataTemplate>
                                         </GridViewColumn.CellTemplate>
                                     </GridViewColumn>
