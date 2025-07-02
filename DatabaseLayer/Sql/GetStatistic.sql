@@ -1,4 +1,6 @@
 ﻿SELECT
-	(SELECT count(*) FROM adrs WHERE outcome = 2) AS wins,
-	(SELECT count(*) FROM adrs WHERE outcome = 3) AS draws,
-	(SELECT count(*) FROM adrs WHERE outcome = 1) AS losses;
+	SUM(outcome = 2) AS wins,
+	SUM(outcome = 3) AS draws,
+	SUM(outcome = 1) AS losses
+FROM
+	adrs;
