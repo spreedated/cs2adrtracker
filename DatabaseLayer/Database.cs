@@ -148,6 +148,7 @@ namespace DatabaseLayer.DataLayer
             return this.conn.Query<AdrRecord>("SELECT id,value,timestamp,outcome FROM adrs;");
         }
 
+        #region Dispose
         public void Dispose()
         {
             this.Dispose(true);
@@ -162,5 +163,6 @@ namespace DatabaseLayer.DataLayer
             this.conn?.Close();
             this.conn?.Dispose();
         }
+        #endregion
     }
 }
