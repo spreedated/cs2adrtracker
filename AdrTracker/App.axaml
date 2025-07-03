@@ -1,0 +1,106 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="AdrTracker.App"
+             xmlns:local="using:AdrTracker"
+             RequestedThemeVariant="Dark">
+  
+    <Application.Styles>
+      <FluentTheme />
+
+      <Style Selector="Button">
+        <Setter Property="Foreground" Value="WhiteSmoke"/>
+      </Style>
+
+      <Style Selector="Label">
+        <Setter Property="Foreground" Value="WhiteSmoke"/>
+      </Style>
+
+      <Style Selector="TextBlock">
+        <Setter Property="Foreground" Value="WhiteSmoke"/>
+      </Style>
+
+      <Style Selector="Window">
+        <Setter Property="WindowStartupLocation" Value="Manual"/>
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="Opacity" Value="0.8"/>
+        <Setter Property="ShowInTaskbar" Value="False"/>
+        <Setter Property="Width" Value="220"/>
+        <Setter Property="SystemDecorations" Value="None"/>
+        <Setter Property="FontFamily" Value="avares://AdrTracker/Resources/Fonts/stratum2-regular-webfont.ttf#Stratum2"/>
+      </Style>
+
+      <Style Selector="Border#BorderWindow">
+        <Setter Property="Background" Value="#222222"/>
+        <Setter Property="CornerRadius" Value="16"/>
+        <Setter Property="Padding" Value="8"/>
+      </Style>
+
+      <Style Selector="TextBlock#Headline">
+        <Setter Property="Foreground" Value="WhiteSmoke"/>
+        <Setter Property="FontFamily" Value="avares://AdrTracker/Resources/Fonts/stratum2-bold-webfont.ttf#Stratum2"/>
+        <Setter Property="FontSize" Value="18"/>
+        <Setter Property="FontStyle" Value="Italic"/>
+        <Setter Property="HorizontalAlignment" Value="Center"/>
+        <Setter Property="FontWeight" Value="Bold"/>
+        <Setter Property="Padding" Value="0,0,4,0"/>
+      </Style>
+
+      <!-- Textbox -->
+      <Style Selector="TextBox">
+        <Setter Property="BorderBrush" Value="Black"/>
+        <Setter Property="Padding" Value="4"/>
+        <Setter Property="Margin" Value="0"/>
+        <Setter Property="MinHeight" Value="8"/>
+        <Setter Property="MinWidth" Value="8"/>
+        <Setter Property="Height" Value="24"/>
+        <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled"/>
+        <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Disabled"/>
+      </Style>
+
+      <Style Selector="TextBox:focus">
+        <Setter Property="Foreground" Value="{DynamicResource TextControlForegroundFocused}" />
+
+        <Style Selector="^ /template/ TextBlock#PART_Watermark">
+          <Setter Property="Foreground" Value="{DynamicResource TextControlPlaceholderForegroundFocused}" />
+        </Style>
+
+        <Style Selector="^ /template/ Border#PART_BorderElement">
+          <Setter Property="Background" Value="{DynamicResource TextControlBackgroundFocused}"/>
+          <Setter Property="BorderBrush" Value="{DynamicResource TextControlBorderBrushFocused}"/>
+          <Setter Property="BorderThickness" Value="1" />
+        </Style>
+      </Style>
+
+      <Style Selector="TextBox:pointerover">
+        <Setter Property="Foreground" Value="{DynamicResource TextControlForegroundPointerOver}" />
+
+        <Style Selector="^ /template/ Border#PART_BorderElement">
+          <Setter Property="BorderBrush" Value="{DynamicResource TextControlBorderBrushPointerOver}"/>
+          <Setter Property="Background" Value="{DynamicResource TextControlBackgroundPointerOver}" />
+        </Style>
+
+        <Style Selector="^ /template/ TextBlock#PART_Watermark">
+          <Setter Property="Foreground" Value="{DynamicResource TextControlPlaceholderForegroundPointerOver}" />
+        </Style>
+      </Style>
+      <!-- # ### #-->
+      
+      <!-- ComboBox -->
+      <Style Selector="ComboBox">
+        <Setter Property="Padding" Value="4,0,4,0"/>
+        <Setter Property="Margin" Value="0"/>
+        <Setter Property="FontSize" Value="12"/>
+        <Setter Property="Height" Value="12"/>
+        <Setter Property="MinHeight" Value="24"/>
+
+        <Style Selector="^ /template/ PathIcon#DropDownGlyph">
+          <Setter Property="Padding" Value="0"/>
+          <Setter Property="Width" Value="4"/>
+          <Setter Property="Height" Value="4"/>
+          <Setter Property="Margin" Value="0"/>
+        </Style>
+      </Style>
+      <!-- # ### #-->
+      
+    </Application.Styles>
+</Application>

@@ -6,14 +6,16 @@
   "compilationOptions": {},
   "targets": {
     ".NETCoreApp,Version=v9.0": {
-      "neXn.Ui.Avalonia/9.0.5": {
+      "neXn.Ui.Avalonia/9.2.2": {
         "dependencies": {
           "Avalonia": "11.3.2",
           "Avalonia.Desktop": "11.3.2",
           "Avalonia.Fonts.Inter": "11.3.2",
           "Avalonia.Themes.Fluent": "11.3.2",
           "CommunityToolkit.Mvvm": "8.4.0",
-          "Projektanker.Icons.Avalonia.FontAwesome": "9.6.2"
+          "Projektanker.Icons.Avalonia.FontAwesome": "9.6.2",
+          "System.Reactive": "6.0.1",
+          "neXn.Ui": "9.0.2"
         },
         "runtime": {
           "neXn.Ui.Avalonia.dll": {}
@@ -421,6 +423,14 @@
         }
       },
       "System.IO.Pipelines/8.0.0": {},
+      "System.Reactive/6.0.1": {
+        "runtime": {
+          "lib/net6.0/System.Reactive.dll": {
+            "assemblyVersion": "6.0.0.0",
+            "fileVersion": "6.0.1.7420"
+          }
+        }
+      },
       "System.Text.Json/9.0.4": {},
       "Tmds.DBus.Protocol/0.21.2": {
         "dependencies": {
@@ -432,11 +442,19 @@
             "fileVersion": "0.21.2.0"
           }
         }
+      },
+      "neXn.Ui/9.0.2": {
+        "runtime": {
+          "neXn.Ui.dll": {
+            "assemblyVersion": "9.0.2.0",
+            "fileVersion": "9.0.2.0"
+          }
+        }
       }
     }
   },
   "libraries": {
-    "neXn.Ui.Avalonia/9.0.5": {
+    "neXn.Ui.Avalonia/9.2.2": {
       "type": "project",
       "serviceable": false,
       "sha512": ""
@@ -630,6 +648,13 @@
       "path": "system.io.pipelines/8.0.0",
       "hashPath": "system.io.pipelines.8.0.0.nupkg.sha512"
     },
+    "System.Reactive/6.0.1": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-rHaWtKDwCi9qJ3ObKo8LHPMuuwv33YbmQi7TcUK1C264V3MFnOr5Im7QgCTdLniztP3GJyeiSg5x8NqYJFqRmg==",
+      "path": "system.reactive/6.0.1",
+      "hashPath": "system.reactive.6.0.1.nupkg.sha512"
+    },
     "System.Text.Json/9.0.4": {
       "type": "package",
       "serviceable": true,
@@ -643,6 +668,11 @@
       "sha512": "sha512-ScSMrUrrw8px4kK1Glh0fZv/HQUlg1078bNXNPfRPKQ3WbRzV9HpsydYEOgSoMK5LWICMf2bMwIFH0pGjxjcMA==",
       "path": "tmds.dbus.protocol/0.21.2",
       "hashPath": "tmds.dbus.protocol.0.21.2.nupkg.sha512"
+    },
+    "neXn.Ui/9.0.2": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
     }
   }
 }

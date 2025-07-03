@@ -1,0 +1,105 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:AdrTracker.ViewModels"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:m="using:DatabaseLayer.Models"
+        xmlns:nuab="using:neXn.Ui.Avalonia.Behaviors"
+        mc:Ignorable="d"
+        x:Class="AdrTracker.Views.MainWindow"
+        x:DataType="vm:MainWindowViewModel"
+        Icon="/Resources/logo.ico"
+        MinHeight="142"
+        MinWidth="220"
+        Width="220"
+        Title="{Binding WindowTitle, Mode=OneWay}"
+        Loaded="Window_Loaded"
+        SizeToContent="Height">
+
+    <Design.DataContext>
+        <vm:MainWindowViewModel/>
+    </Design.DataContext>
+
+    <Border x:Name="BorderWindow">
+      <Grid Margin="0,6,0,0">
+        <Grid.RowDefinitions>
+          <RowDefinition Height="*" />
+          <RowDefinition Height="*" />
+          <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+          <Border CornerRadius="6" ClipToBounds="True" Margin="0,0,4,0">
+            <Image Source="/Resources/logo_512x512.png" MaxWidth="26"/>
+          </Border>
+          <TextBlock Name="Headline" Grid.Row="0" Text="CS2 ADR Tracker" VerticalAlignment="Center"/>
+        </StackPanel>
+
+        <Grid Grid.Row="1" Margin="8">
+          <Grid.RowDefinitions>
+            <RowDefinition/>
+            <RowDefinition/>
+          </Grid.RowDefinitions>
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+          </Grid.ColumnDefinitions>
+
+          <TextBlock Grid.Column="0" Grid.ColumnSpan="2" HorizontalAlignment="Center">
+            <TextBlock.Text>
+              <MultiBinding StringFormat="{}   Current ADR: {0:#.##} &#xA;Tracked games: {1}">
+                <Binding Path="CurrentAdr"/>
+                <Binding Path="TrackedGamesCount"/>
+              </MultiBinding>
+            </TextBlock.Text>
+          </TextBlock>
+
+          <Border Grid.Column="1"
+                  CornerRadius="2"
+                  HorizontalAlignment="Right"
+                  Margin="0,0,8,0"
+                  Width="12"
+                  Height="12"
+                  Background="{Binding IndicatorBrush}">
+            <Border.Effect>
+              <DropShadowEffect Color="{Binding IndicatorShadowColor}" BlurRadius="12" OffsetX="0" OffsetY="0"/>
+            </Border.Effect>
+          </Border>
+
+          <StackPanel Grid.Row="1" Grid.ColumnSpan="2" Orientation="Horizontal" HorizontalAlignment="Center">
+            <StackPanel Grid.Row="1" Grid.ColumnSpan="2" Orientation="Horizontal" HorizontalAlignment="Center" Spacing="4">
+              <TextBlock Text="{Binding Statistic.Wins}" Foreground="Green" FontWeight="Bold" />
+              <TextBlock Text="/" Margin="2,0"/>
+              <TextBlock Text="{Binding Statistic.Draws}" Foreground="Goldenrod" FontWeight="Bold"/>
+              <TextBlock Text="/" Margin="2,0"/>
+              <TextBlock Text="{Binding Statistic.Losses}" Foreground="Red" FontWeight="Bold"/>
+            </StackPanel>
+          </StackPanel>
+
+        </Grid>
+
+        <!-- Add new ADR-->
+        <Grid Grid.Row="2">
+          <Grid.RowDefinitions>
+            <RowDefinition/>
+            <RowDefinition/>
+          </Grid.RowDefinitions>
+
+          <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Center">
+            <Label HorizontalAlignment="Right" Content="Add new ADR:" VerticalAlignment="Center" Margin="0,0,4,0"/>
+            <TextBox Text="{Binding InputAdr, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" nuab:TextBoxBehaviors.NumbersOnly="True" MinWidth="36" MaxLength="3">
+                <TextBox.KeyBindings>
+                  <KeyBinding Gesture="Enter" Command="{Binding AddCommand}"/>
+                </TextBox.KeyBindings>
+              </TextBox>
+            <ComboBox PointerEntered="ComboBox_PointerEntered" PointerExited="ComboBox_PointerExited" Margin="8,0,0,0" Width="68" ItemsSource="{Binding OutcomeList, Mode=OneWay}" SelectedItem="{Binding Outcome}"/>
+          </StackPanel>
+
+          <Button Grid.Row="1" HorizontalAlignment="Center" Margin="0,8,0,0" Padding="8,2,8,2" Content="Add" IsVisible="{Binding IsAddButtonVisible}" Command="{Binding AddCommand}"/>
+        </Grid>
+        <!-- # ### #-->
+
+        </Grid>
+    </Border>
+
+</Window>

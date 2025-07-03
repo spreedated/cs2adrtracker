@@ -1,0 +1,60 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net9.0</TargetFramework>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+    <Authors>Dante Karl Wackermann</Authors>
+    <NoWarn>1701;1701;IDE0290;IDE0063</NoWarn>
+    <RootNamespace>AdrTracker</RootNamespace>
+  </PropertyGroup>
+
+
+  <ItemGroup>
+    <PackageReference Include="Avalonia" Version="11.3.2" />
+    <PackageReference Include="Avalonia.Desktop" Version="11.3.2" />
+    <PackageReference Include="Avalonia.Themes.Fluent" Version="11.3.2" />
+    <PackageReference Include="Avalonia.Fonts.Inter" Version="11.3.2" />
+    <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="11.3.2" />
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.6" />
+    <PackageReference Include="Serilog" Version="4.3.0" />
+    <PackageReference Include="Serilog.Extensions.Logging" Version="9.0.2" />
+    <PackageReference Include="Serilog.Sinks.Console" Version="6.0.0" />
+    <PackageReference Include="Serilog.Sinks.Debug" Version="3.0.0" />
+    <PackageReference Include="System.Reactive" Version="6.0.1" />
+  </ItemGroup>
+
+
+  <ItemGroup>
+    <ProjectReference Include="..\DatabaseLayer\DatabaseLayer.csproj" />
+  </ItemGroup>
+
+
+  <ItemGroup>
+    <Reference Include="neXn.Lib.ConfigurationHandler">
+      <HintPath>..\Libraries\neXn.Lib.ConfigurationHandler.dll</HintPath>
+    </Reference>
+    <Reference Include="neXn.Ui">
+      <HintPath>..\Libraries\neXn.Ui.dll</HintPath>
+    </Reference>
+    <Reference Include="neXn.Ui.Avalonia">
+      <HintPath>..\Libraries\neXn.Ui.Avalonia.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+
+  <ItemGroup>
+    <AvaloniaResource Include="Resources\Fonts\stratum2-bold-webfont.ttf" />
+    <AvaloniaResource Include="Resources\Fonts\stratum2-medium-webfont.ttf" />
+    <AvaloniaResource Include="Resources\Fonts\stratum2-regular-webfont.ttf" />
+    <AvaloniaResource Include="Resources\logo.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </AvaloniaResource>
+    <AvaloniaResource Include="Resources\logo.svg" />
+    <AvaloniaResource Include="Resources\logo_512x512.png" />
+  </ItemGroup>
+</Project>

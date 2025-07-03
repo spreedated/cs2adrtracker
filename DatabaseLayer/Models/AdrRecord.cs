@@ -9,7 +9,7 @@ namespace DatabaseLayer.Models
     {
         public enum Outcomes
         {
-            Unknown,
+            Unset,
             Loss,
             Win,
             Draw

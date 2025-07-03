@@ -4,16 +4,19 @@
 using Dapper;
 using DatabaseLayer.Models;
 using Microsoft.Data.Sqlite;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using static DatabaseLayer.Logic.HelperFunctions;
 
 namespace DatabaseLayer.DataLayer
 {
     public class Database : IDisposable
     {
+        private readonly ILogger logger;
         private readonly string databasePath;
         internal SqliteConnection conn;
 
@@ -23,8 +26,9 @@ namespace DatabaseLayer.DataLayer
         /// </summary>
         /// <param name="dbFilepath"></param>
         /// <param name="autoOpenConnection">Auto open a connection</param>
-        public Database(string dbFilepath, bool autoOpenConnection = true)
+        public Database(string dbFilepath, bool autoOpenConnection = true, ILogger logger = null)
         {
+            this.logger = logger;
             this.databasePath = dbFilepath;
 
             if (string.IsNullOrEmpty(dbFilepath))
@@ -34,21 +38,23 @@ namespace DatabaseLayer.DataLayer
 
             if (!File.Exists(this.databasePath))
             {
-                this.CreateEmptyDatabase();
+                this.CreateEmptyDatabase().Wait();
             }
 
             if (autoOpenConnection)
             {
-                this.Open();
+                this.OpenAsync().Wait();
             }
         }
         #endregion
 
-        private void CreateEmptyDatabase()
+        private async Task CreateEmptyDatabase()
         {
-            this.Open();
-            this.conn.Execute(LoadEmbeddedSql("CreateTableAdrs"));
-            this.conn.Close();
+            await this.OpenAsync();
+            await this.conn.ExecuteAsync(LoadEmbeddedSql("CreateTableAdrs"));
+            await this.conn.CloseAsync();
+
+            this.logger?.LogInformation("Database created at {DatabasePath}", this.databasePath);
         }
 
         private static DynamicParameters CreateInsertDynamicParameters(AdrRecord adr)
@@ -69,7 +75,7 @@ namespace DatabaseLayer.DataLayer
             return new(paramDictionary);
         }
 
-        public void Open()
+        public async Task OpenAsync()
         {
             this.Close();
 
@@ -82,13 +88,17 @@ namespace DatabaseLayer.DataLayer
             this.conn = new(b.ToString());
             SQLitePCL.Batteries.Init();
 
-            this.conn.Open();
+            await this.conn.OpenAsync();
+
+            this.logger?.LogTrace("Database connection opened to {DatabasePath}", this.databasePath);
         }
 
         public void Close()
         {
             this.conn?.Close();
             this.conn?.Dispose();
+
+            this.logger?.LogTrace("Database connection closed to {DatabasePath}", this.databasePath);
         }
 
         public bool AddAdr(AdrRecord adr)
@@ -155,6 +165,8 @@ namespace DatabaseLayer.DataLayer
             GC.Collect();
             GC.WaitForPendingFinalizers();
             GC.SuppressFinalize(this);
+
+            this.logger?.LogTrace("Database disposed");
         }
 
         protected virtual void Dispose(bool disposing)
