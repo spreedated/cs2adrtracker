@@ -4,7 +4,9 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:m="using:DatabaseLayer.Models"
+        xmlns:conv="using:AdrTracker.Converters"
         xmlns:nuab="using:neXn.Ui.Avalonia.Behaviors"
+        xmlns:lvc="using:LiveChartsCore.SkiaSharpView.Avalonia"
         mc:Ignorable="d"
         x:Class="AdrTracker.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
@@ -26,14 +28,18 @@
           <RowDefinition Height="*" />
           <RowDefinition Height="*" />
           <RowDefinition Height="*" />
+          <RowDefinition Height="*" />
+          <RowDefinition Height="auto" />
         </Grid.RowDefinitions>
 
-        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+        <!-- Header -->
+        <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Center">
           <Border CornerRadius="6" ClipToBounds="True" Margin="0,0,4,0">
             <Image Source="/Resources/logo_512x512.png" MaxWidth="26"/>
           </Border>
           <TextBlock Name="Headline" Grid.Row="0" Text="CS2 ADR Tracker" VerticalAlignment="Center"/>
         </StackPanel>
+        <!-- # ### #-->
 
         <Grid Grid.Row="1" Margin="8">
           <Grid.RowDefinitions>
@@ -45,7 +51,8 @@
             <ColumnDefinition/>
           </Grid.ColumnDefinitions>
 
-          <TextBlock Grid.Column="0" Grid.ColumnSpan="2" HorizontalAlignment="Center">
+          <!-- String stats -->
+          <TextBlock FontSize="12" Grid.Column="0" Grid.ColumnSpan="2" HorizontalAlignment="Center">
             <TextBlock.Text>
               <MultiBinding StringFormat="{}   Current ADR: {0:#.##} &#xA;Tracked games: {1}">
                 <Binding Path="CurrentAdr"/>
@@ -53,7 +60,9 @@
               </MultiBinding>
             </TextBlock.Text>
           </TextBlock>
+          <!-- # ### # -->
 
+          <!-- Indicator Light -->
           <Border Grid.Column="1"
                   CornerRadius="2"
                   HorizontalAlignment="Right"
@@ -65,39 +74,70 @@
               <DropShadowEffect Color="{Binding IndicatorShadowColor}" BlurRadius="12" OffsetX="0" OffsetY="0"/>
             </Border.Effect>
           </Border>
-
-          <StackPanel Grid.Row="1" Grid.ColumnSpan="2" Orientation="Horizontal" HorizontalAlignment="Center">
-            <StackPanel Grid.Row="1" Grid.ColumnSpan="2" Orientation="Horizontal" HorizontalAlignment="Center" Spacing="4">
-              <TextBlock Text="{Binding Statistic.Wins}" Foreground="Green" FontWeight="Bold" />
-              <TextBlock Text="/" Margin="2,0"/>
-              <TextBlock Text="{Binding Statistic.Draws}" Foreground="Goldenrod" FontWeight="Bold"/>
-              <TextBlock Text="/" Margin="2,0"/>
-              <TextBlock Text="{Binding Statistic.Losses}" Foreground="Red" FontWeight="Bold"/>
-            </StackPanel>
-          </StackPanel>
-
+          <!-- # ### #-->
         </Grid>
 
+        <!-- Quick Stats -->
+        <StackPanel Grid.Row="2" Grid.ColumnSpan="2" Orientation="Vertical" HorizontalAlignment="Center">
+          <StackPanel Grid.Row="1" Grid.ColumnSpan="2" Orientation="Horizontal" HorizontalAlignment="Center" Spacing="4">
+            <TextBlock Text="{Binding Statistic.Wins}" Foreground="Green" FontWeight="Bold" />
+            <TextBlock Text="/" Margin="2,0"/>
+            <TextBlock Text="{Binding Statistic.Draws}" Foreground="Goldenrod" FontWeight="Bold"/>
+            <TextBlock Text="/" Margin="2,0"/>
+            <TextBlock Text="{Binding Statistic.Losses}" Foreground="Red" FontWeight="Bold"/>
+          </StackPanel>
+
+          <lvc:CartesianChart Series="{Binding Series}" Height="60" Width="90" LegendPosition="Hidden" YAxes="{Binding YAxes}" XAxes="{Binding XAxes}" TooltipPosition="Hidden" Margin="0,0,0,12">
+          </lvc:CartesianChart>
+        </StackPanel>
+        <!-- # ### # -->
+
         <!-- Add new ADR-->
-        <Grid Grid.Row="2">
+        <Grid Grid.Row="3" Margin="0,0,0,12">
           <Grid.RowDefinitions>
             <RowDefinition/>
             <RowDefinition/>
           </Grid.RowDefinitions>
 
           <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Center">
-            <Label HorizontalAlignment="Right" Content="Add new ADR:" VerticalAlignment="Center" Margin="0,0,4,0"/>
+            <TextBlock FontSize="14" HorizontalAlignment="Right" Text="New ADR:" VerticalAlignment="Center" Margin="0,0,6,0"/>
             <TextBox Text="{Binding InputAdr, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" nuab:TextBoxBehaviors.NumbersOnly="True" MinWidth="36" MaxLength="3">
                 <TextBox.KeyBindings>
                   <KeyBinding Gesture="Enter" Command="{Binding AddCommand}"/>
                 </TextBox.KeyBindings>
               </TextBox>
-            <ComboBox PointerEntered="ComboBox_PointerEntered" PointerExited="ComboBox_PointerExited" Margin="8,0,0,0" Width="68" ItemsSource="{Binding OutcomeList, Mode=OneWay}" SelectedItem="{Binding Outcome}"/>
+            <ComboBox PointerEntered="ComboBox_PointerEntered" PointerExited="ComboBox_PointerExited" Margin="10,0,0,0" Width="68" ItemsSource="{Binding OutcomeList, Mode=OneWay}" SelectedItem="{Binding Outcome}"/>
           </StackPanel>
 
           <Button Grid.Row="1" HorizontalAlignment="Center" Margin="0,8,0,0" Padding="8,2,8,2" Content="Add" IsVisible="{Binding IsAddButtonVisible}" Command="{Binding AddCommand}"/>
         </Grid>
         <!-- # ### #-->
+
+        <Expander Grid.Row="4" ExpandDirection="Down" HorizontalAlignment="Center" MinWidth="180">
+          <Expander.Header>
+            <StackPanel>
+              <TextBlock Text="{Binding Last10Average, StringFormat=Last 10 Matches ({0:#.##})}"/>
+            </StackPanel>
+          </Expander.Header>
+          <ListBox ItemsSource="{Binding Last10Records}" BorderThickness="0">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                  <StackPanel Orientation="Horizontal" Margin="0,0,0,0">
+                    <TextBlock Text="{Binding Value}" Width="24" HorizontalAlignment="Left" Padding="0"/>
+                    <TextBlock Text="{Binding Outcome}" Width="36" HorizontalAlignment="Left" Padding="0">
+                      <TextBlock.Styles>
+                        <Style Selector="TextBlock">
+                          <Setter Property="Foreground" Value="{Binding Outcome, Converter={conv:OutcomeToColorConverter}}"/>
+                        </Style>
+                      </TextBlock.Styles>
+                    </TextBlock>
+                    <TextBlock Text="{Binding DateTime, StringFormat='{}{0:dd.MM.yyyy HH:mm}'}" HorizontalAlignment="Right"/>
+                    <Button Content="X" HorizontalAlignment="Right" Padding="0" Margin="4,0,0,0"/>
+                  </StackPanel>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+          </ListBox>
+        </Expander>
 
         </Grid>
     </Border>

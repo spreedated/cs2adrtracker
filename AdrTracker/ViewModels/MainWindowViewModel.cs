@@ -1,22 +1,31 @@
-﻿using Avalonia.Controls;
+﻿using AdrTracker.Logic;
+using Avalonia.Controls;
+using Avalonia.Media;
+using Avalonia.Media.Immutable;
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using DatabaseLayer.Models;
-using System.Collections.ObjectModel;
+using LiveChartsCore;
+using LiveChartsCore.SkiaSharpView;
+using LiveChartsCore.SkiaSharpView.Drawing.Geometries;
+using LiveChartsCore.SkiaSharpView.Painting;
+using Microsoft.Extensions.Logging;
+using Serilog;
+using Serilog.Extensions.Logging;
+using SkiaSharp;
 using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
-using AdrTracker.Logic;
-using Avalonia.Media;
-using CommunityToolkit.Mvvm.Input;
-using System.Collections.Generic;
-using System.Linq;
-using Serilog;
-using Avalonia.Media.Immutable;
 
 namespace AdrTracker.ViewModels
 {
     public partial class MainWindowViewModel : ObservableObject
     {
+        private readonly Microsoft.Extensions.Logging.ILogger logger;
+
         #region BindableProperties
         [ObservableProperty]
         private string windowTitle;
@@ -57,6 +66,15 @@ namespace AdrTracker.ViewModels
         private Statistic statistic;
         #endregion
 
+        [ObservableProperty]
+        private ISeries[] series;
+
+        [ObservableProperty]
+        private Axis[] xAxes = [new() { IsVisible = false }];
+
+        [ObservableProperty]
+        private Axis[] yAxes = [new() { IsVisible = false }];
+
         #region Ctor
         public MainWindowViewModel()
         {
@@ -64,7 +82,20 @@ namespace AdrTracker.ViewModels
             
             if (Design.IsDesignMode)
             {
-                this.CurrentAdr = 88.45f;
+                this.Last10Records =
+                [
+                    new AdrRecord() { Value = 85, Timestamp = DateTimeOffset.Now.ToUnixTimeSeconds(), Outcome = AdrRecord.Outcomes.Win },
+                    new AdrRecord() { Value = 90, Timestamp = DateTimeOffset.Now.ToUnixTimeSeconds(), Outcome = AdrRecord.Outcomes.Win },
+                    new AdrRecord() { Value = 95, Timestamp = DateTimeOffset.Now.ToUnixTimeSeconds(), Outcome = AdrRecord.Outcomes.Win },
+                    new AdrRecord() { Value = 80, Timestamp = DateTimeOffset.Now.ToUnixTimeSeconds(), Outcome = AdrRecord.Outcomes.Loss },
+                    new AdrRecord() { Value = 75, Timestamp = DateTimeOffset.Now.ToUnixTimeSeconds(), Outcome = AdrRecord.Outcomes.Loss },
+                    new AdrRecord() { Value = 100, Timestamp = DateTimeOffset.Now.ToUnixTimeSeconds(), Outcome = AdrRecord.Outcomes.Win },
+                    new AdrRecord() { Value = 110, Timestamp = DateTimeOffset.Now.ToUnixTimeSeconds(), Outcome = AdrRecord.Outcomes.Win },
+                    new AdrRecord() { Value = 120, Timestamp = DateTimeOffset.Now.ToUnixTimeSeconds(), Outcome = AdrRecord.Outcomes.Draw },
+                    new AdrRecord() { Value = 130, Timestamp = DateTimeOffset.Now.ToUnixTimeSeconds(), Outcome = AdrRecord.Outcomes.Draw },
+                    new AdrRecord() { Value = 140, Timestamp = DateTimeOffset.Now.ToUnixTimeSeconds(), Outcome = AdrRecord.Outcomes.Win }
+                ];
+                this.CurrentAdr = 88.42f;
                 this.TrackedGamesCount = 142;
                 this.Statistic = new()
                 {
@@ -74,6 +105,8 @@ namespace AdrTracker.ViewModels
                 };
                 return;
             }
+
+            this.logger = Log.Logger != null ? new SerilogLoggerProvider(Log.Logger).CreateLogger("MainWindowViewModel"): null;
 
             Task.Run(async () =>
             {
@@ -88,7 +121,7 @@ namespace AdrTracker.ViewModels
         {
             if (!int.TryParse(this.InputAdr, out int outadr))
             {
-                Log.Warning("Invalid adr provided \"{InputAdr}\"", this.InputAdr);
+                this.logger?.LogWarning("Invalid ADR provided \"{InputAdr}\"", this.InputAdr);
                 return;
             }
 
@@ -96,11 +129,11 @@ namespace AdrTracker.ViewModels
             {
                 if (!Globals.Database.AddAdr(new AdrRecord() { Value = outadr, Timestamp = DateTimeOffset.Now.ToUnixTimeSeconds(), Outcome = this.Outcome }))
                 {
-                    Log.Warning("ADR value \"{Outadr}\" NOT added to database due to being invalid", outadr);
+                    this.logger?.LogWarning("ADR value \"{Outadr}\" NOT added to database due to being invalid", outadr);
                     return;
                 }
 
-                Log.Information("ADR value \"{Outadr}\" (Outcome: \"{Outcome}\") added to database", outadr, this.Outcome.ToString());
+                this.logger?.LogInformation("ADR value \"{Outadr}\" (Outcome: \"{Outcome}\") added to database", outadr, this.Outcome.ToString());
             });
 
             await this.RefreshData();
@@ -139,7 +172,35 @@ namespace AdrTracker.ViewModels
             base.OnPropertyChanged(nameof(this.IndicatorBrush));
             base.OnPropertyChanged(nameof(this.IndicatorShadowColor));
 
-            Log.Verbose("Data refreshed");
+            this.Series =
+                [
+                    new RowSeries<int>(this.Statistic.Wins)
+                    {
+                        Name = "Wins",
+                        Fill = new SolidColorPaint(SKColors.LimeGreen),
+                        DataLabelsSize = 14,
+                        DataLabelsPosition = LiveChartsCore.Measure.DataLabelsPosition.Middle,
+                        DataLabelsPaint = new SolidColorPaint(SKColors.WhiteSmoke)
+                    },
+                    new RowSeries<int>(this.Statistic.Draws)
+                    {
+                        Name = "Draws",
+                        Fill = new SolidColorPaint(SKColors.Gold),
+                        DataLabelsSize = 14,
+                        DataLabelsPosition = LiveChartsCore.Measure.DataLabelsPosition.Middle,
+                        DataLabelsPaint = new SolidColorPaint(SKColors.WhiteSmoke)
+                    },
+                    new RowSeries<int>(this.Statistic.Losses)
+                    {
+                        Name = "Loss",
+                        Fill = new SolidColorPaint(SKColors.Firebrick),
+                        DataLabelsSize = 14,
+                        DataLabelsPosition = LiveChartsCore.Measure.DataLabelsPosition.Middle,
+                        DataLabelsPaint = new SolidColorPaint(SKColors.WhiteSmoke)
+                    }
+                ];
+
+            this.logger?.LogTrace("Data refreshed");
         }
 
         public IImmutableSolidColorBrush IndicatorBrush
