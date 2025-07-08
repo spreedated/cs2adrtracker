@@ -18,11 +18,11 @@ namespace AdrTracker.Converters
                 {
                     case AdrRecord.Outcomes.Unset:
                         return new ImmutableSolidColorBrush(Color.Parse("#DDDDDD"));
-                    case AdrRecord.Outcomes.Loss:
+                    case AdrRecord.Outcomes.Defeat:
                         return new ImmutableSolidColorBrush(Color.Parse("#B22222"));
-                    case AdrRecord.Outcomes.Win:
+                    case AdrRecord.Outcomes.Victory:
                         return new ImmutableSolidColorBrush(Color.Parse("#228B22"));
-                    case AdrRecord.Outcomes.Draw:
+                    case AdrRecord.Outcomes.Tie:
                         return new ImmutableSolidColorBrush(Color.Parse("#FFD700"));
                 }
             }

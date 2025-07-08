@@ -10,9 +10,9 @@ namespace DatabaseLayer.Models
         public enum Outcomes
         {
             Unset,
-            Loss,
-            Win,
-            Draw
+            Defeat,
+            Victory,
+            Tie
         }
 
         public int Id { get; set; }

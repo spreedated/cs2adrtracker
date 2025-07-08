@@ -18,128 +18,150 @@
         Loaded="Window_Loaded"
         SizeToContent="Height">
 
-    <Design.DataContext>
-        <vm:MainWindowViewModel/>
-    </Design.DataContext>
+  <Window.DataContext>
+      <vm:MainWindowViewModel/>
+  </Window.DataContext>
 
-    <Border x:Name="BorderWindow">
-      <Grid Margin="0,6,0,0">
+  <Window.ContextMenu>
+    <ContextMenu>
+      <MenuItem Header="Show _chart" Command="{Binding ShowCheckBoxClickCommand}" CommandParameter="{Binding RelativeSource={RelativeSource Self}}" Tag="ShowQuickStatsChart">
+        <MenuItem.Icon>
+          <CheckBox BorderThickness="0" IsHitTestVisible="True" IsChecked="{Binding ShowQuickStatsChart, Mode=TwoWay}"/>
+        </MenuItem.Icon>
+      </MenuItem>
+      <MenuItem Header="Show _stats" Command="{Binding ShowCheckBoxClickCommand}" CommandParameter="{Binding RelativeSource={RelativeSource Self}}" Tag="ShowQuickStatsString">
+        <MenuItem.Icon>
+          <CheckBox BorderThickness="0" IsHitTestVisible="True" IsChecked="{Binding ShowQuickStatsString, Mode=TwoWay}"/>
+        </MenuItem.Icon>
+      </MenuItem>
+      <Separator/>
+      <MenuItem Header="{Binding VersionInfo}" IsEnabled="False" />
+      <Separator/>
+      <MenuItem Header="_Statistics" Command="{Binding OpenStatisticsCommand}"/>
+      <MenuItem Header="E_xit" Command="{Binding CloseApplicationCommand}"/>
+    </ContextMenu>
+  </Window.ContextMenu>
+
+  <Border x:Name="BorderWindow">
+    <Grid Margin="0,6,0,0">
+      <Grid.RowDefinitions>
+        <RowDefinition Height="*" />
+        <RowDefinition Height="*" />
+        <RowDefinition Height="*" />
+        <RowDefinition Height="*" />
+        <RowDefinition Height="auto" />
+      </Grid.RowDefinitions>
+
+      <!-- Header -->
+      <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Center">
+        <Border CornerRadius="6" ClipToBounds="True" Margin="0,0,8,0">
+          <Image Source="/Resources/logo_512x512.png" MaxWidth="26"/>
+        </Border>
+        <TextBlock Name="Headline" Grid.Row="0" Text="CS2 ADR Tracker" VerticalAlignment="Center"/>
+      </StackPanel>
+      <!-- # ### # -->
+
+      <Grid Grid.Row="1" Margin="8">
         <Grid.RowDefinitions>
-          <RowDefinition Height="*" />
-          <RowDefinition Height="*" />
-          <RowDefinition Height="*" />
-          <RowDefinition Height="*" />
-          <RowDefinition Height="auto" />
+          <RowDefinition/>
+          <RowDefinition/>
         </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition/>
+          <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
 
-        <!-- Header -->
-        <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Center">
-          <Border CornerRadius="6" ClipToBounds="True" Margin="0,0,4,0">
-            <Image Source="/Resources/logo_512x512.png" MaxWidth="26"/>
-          </Border>
-          <TextBlock Name="Headline" Grid.Row="0" Text="CS2 ADR Tracker" VerticalAlignment="Center"/>
-        </StackPanel>
-        <!-- # ### #-->
-
-        <Grid Grid.Row="1" Margin="8">
-          <Grid.RowDefinitions>
-            <RowDefinition/>
-            <RowDefinition/>
-          </Grid.RowDefinitions>
-          <Grid.ColumnDefinitions>
-            <ColumnDefinition/>
-            <ColumnDefinition/>
-          </Grid.ColumnDefinitions>
-
-          <!-- String stats -->
-          <TextBlock FontSize="12" Grid.Column="0" Grid.ColumnSpan="2" HorizontalAlignment="Center">
-            <TextBlock.Text>
-              <MultiBinding StringFormat="{}   Current ADR: {0:#.##} &#xA;Tracked games: {1}">
-                <Binding Path="CurrentAdr"/>
-                <Binding Path="TrackedGamesCount"/>
-              </MultiBinding>
-            </TextBlock.Text>
-          </TextBlock>
-          <!-- # ### # -->
-
-          <!-- Indicator Light -->
-          <Border Grid.Column="1"
-                  CornerRadius="2"
-                  HorizontalAlignment="Right"
-                  Margin="0,0,8,0"
-                  Width="12"
-                  Height="12"
-                  Background="{Binding IndicatorBrush}">
-            <Border.Effect>
-              <DropShadowEffect Color="{Binding IndicatorShadowColor}" BlurRadius="12" OffsetX="0" OffsetY="0"/>
-            </Border.Effect>
-          </Border>
-          <!-- # ### #-->
-        </Grid>
-
-        <!-- Quick Stats -->
-        <StackPanel Grid.Row="2" Grid.ColumnSpan="2" Orientation="Vertical" HorizontalAlignment="Center">
-          <StackPanel Grid.Row="1" Grid.ColumnSpan="2" Orientation="Horizontal" HorizontalAlignment="Center" Spacing="4">
-            <TextBlock Text="{Binding Statistic.Wins}" Foreground="Green" FontWeight="Bold" />
-            <TextBlock Text="/" Margin="2,0"/>
-            <TextBlock Text="{Binding Statistic.Draws}" Foreground="Goldenrod" FontWeight="Bold"/>
-            <TextBlock Text="/" Margin="2,0"/>
-            <TextBlock Text="{Binding Statistic.Losses}" Foreground="Red" FontWeight="Bold"/>
-          </StackPanel>
-
-          <lvc:CartesianChart Series="{Binding Series}" Height="60" Width="90" LegendPosition="Hidden" YAxes="{Binding YAxes}" XAxes="{Binding XAxes}" TooltipPosition="Hidden" Margin="0,0,0,12">
-          </lvc:CartesianChart>
-        </StackPanel>
+        <!-- String stats -->
+        <TextBlock FontSize="12" Grid.Column="0" Grid.ColumnSpan="2" HorizontalAlignment="Center">
+          <TextBlock.Text>
+            <MultiBinding StringFormat="{}   Current ADR: {0:#.##} &#xA;Tracked games: {1}">
+              <Binding Path="CurrentAdr"/>
+              <Binding Path="TrackedGamesCount"/>
+            </MultiBinding>
+          </TextBlock.Text>
+        </TextBlock>
         <!-- # ### # -->
 
-        <!-- Add new ADR-->
-        <Grid Grid.Row="3" Margin="0,0,0,12">
-          <Grid.RowDefinitions>
-            <RowDefinition/>
-            <RowDefinition/>
-          </Grid.RowDefinitions>
+        <!-- Indicator Light -->
+        <Border Grid.Column="1"
+                CornerRadius="2"
+                HorizontalAlignment="Right"
+                Margin="0,0,8,0"
+                Width="12"
+                Height="12"
+                Background="{Binding IndicatorBrush}">
+          <Border.Effect>
+            <DropShadowEffect Color="{Binding IndicatorShadowColor}" BlurRadius="12" OffsetX="0" OffsetY="0"/>
+          </Border.Effect>
+        </Border>
+        <!-- # ### # -->
+      </Grid>
 
-          <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Center">
-            <TextBlock FontSize="14" HorizontalAlignment="Right" Text="New ADR:" VerticalAlignment="Center" Margin="0,0,6,0"/>
-            <TextBox Text="{Binding InputAdr, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" nuab:TextBoxBehaviors.NumbersOnly="True" MinWidth="36" MaxLength="3">
-                <TextBox.KeyBindings>
-                  <KeyBinding Gesture="Enter" Command="{Binding AddCommand}"/>
-                </TextBox.KeyBindings>
-              </TextBox>
-            <ComboBox PointerEntered="ComboBox_PointerEntered" PointerExited="ComboBox_PointerExited" Margin="10,0,0,0" Width="68" ItemsSource="{Binding OutcomeList, Mode=OneWay}" SelectedItem="{Binding Outcome}"/>
+      <!-- Quick Stats + Chart -->
+      <StackPanel Grid.Row="2" Grid.ColumnSpan="2" Orientation="Vertical" HorizontalAlignment="Center" Margin="0,0,0,8">
+        <StackPanel Grid.Row="1" Grid.ColumnSpan="2" Orientation="Horizontal" HorizontalAlignment="Center" Spacing="4" IsVisible="{Binding ShowQuickStatsString}">
+          <TextBlock Text="{Binding Statistic.Victories}" Foreground="Green" FontWeight="Bold" />
+          <TextBlock Text="/" Margin="2,0"/>
+          <TextBlock Text="{Binding Statistic.Ties}" Foreground="Goldenrod" FontWeight="Bold"/>
+          <TextBlock Text="/" Margin="2,0"/>
+          <TextBlock Text="{Binding Statistic.Defeats}" Foreground="Red" FontWeight="Bold"/>
+        </StackPanel>
+
+        <lvc:CartesianChart Name="Quickstats" Series="{Binding QuickStatsChartSeries}" YAxes="{Binding HideAxesY}" XAxes="{Binding HideAxesX}" IsVisible="{Binding ShowQuickStatsChart}">
+        </lvc:CartesianChart>
+      </StackPanel>
+      <!-- # ### # -->
+
+      <!-- Add new ADR -->
+      <Grid Grid.Row="3" Margin="0,0,0,12">
+        <Grid.RowDefinitions>
+          <RowDefinition/>
+          <RowDefinition/>
+        </Grid.RowDefinitions>
+
+        <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Center">
+          <TextBlock FontSize="14" HorizontalAlignment="Right" Text="New ADR:" VerticalAlignment="Center" Margin="0,0,6,0"/>
+          <TextBox Text="{Binding InputAdr, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" nuab:TextBoxBehaviors.NumbersOnly="True" MinWidth="36" MaxLength="3">
+              <TextBox.KeyBindings>
+                <KeyBinding Gesture="Enter" Command="{Binding AddCommand}"/>
+              </TextBox.KeyBindings>
+            </TextBox>
+          <ComboBox PointerEntered="ComboBox_PointerEntered" PointerExited="ComboBox_PointerExited" Margin="10,0,0,0" Width="74" ItemsSource="{Binding OutcomeList, Mode=OneWay}" SelectedItem="{Binding Outcome}"/>
+        </StackPanel>
+
+        <Button Grid.Row="1" HorizontalAlignment="Center" Margin="0,8,0,0" Padding="8,2,8,2" Content="Add" IsVisible="{Binding IsAddButtonVisible}" Command="{Binding AddCommand}"/>
+      </Grid>
+      <!-- # ### # -->
+
+      <!-- Expander -->
+      <Expander Grid.Row="4" ExpandDirection="Down" HorizontalAlignment="Center" MinWidth="180">
+        <Expander.Header>
+          <StackPanel>
+            <TextBlock Text="{Binding Last10Average, StringFormat=Last 10 Matches ({0:#.##})}"/>
           </StackPanel>
+        </Expander.Header>
+        <ListBox ItemsSource="{Binding Last10Records}" BorderThickness="0">
+          <ListBox.ItemTemplate>
+              <DataTemplate>
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,0">
+                  <TextBlock Text="{Binding DateTime, StringFormat='{}{0:dd.MM.yy - HH:mm}'}" HorizontalAlignment="Left" Margin="0,0,12,0"/>
+                  <TextBlock Text="{Binding Value}" Width="24" HorizontalAlignment="Left" Padding="0"/>
+                  <TextBlock Text="{Binding Outcome}" Width="36" HorizontalAlignment="Right" Padding="0">
+                    <TextBlock.Styles>
+                      <Style Selector="TextBlock">
+                        <Setter Property="Foreground" Value="{Binding Outcome, Converter={conv:OutcomeToColorConverter}}"/>
+                      </Style>
+                    </TextBlock.Styles>
+                  </TextBlock>
+                  <Button Content="X" HorizontalAlignment="Right" Padding="0" Margin="4,0,0,0"/>
+                </StackPanel>
+              </DataTemplate>
+          </ListBox.ItemTemplate>
+        </ListBox>
+      </Expander>
+      <!-- # ### # -->
 
-          <Button Grid.Row="1" HorizontalAlignment="Center" Margin="0,8,0,0" Padding="8,2,8,2" Content="Add" IsVisible="{Binding IsAddButtonVisible}" Command="{Binding AddCommand}"/>
-        </Grid>
-        <!-- # ### #-->
-
-        <Expander Grid.Row="4" ExpandDirection="Down" HorizontalAlignment="Center" MinWidth="180">
-          <Expander.Header>
-            <StackPanel>
-              <TextBlock Text="{Binding Last10Average, StringFormat=Last 10 Matches ({0:#.##})}"/>
-            </StackPanel>
-          </Expander.Header>
-          <ListBox ItemsSource="{Binding Last10Records}" BorderThickness="0">
-            <ListBox.ItemTemplate>
-                <DataTemplate>
-                  <StackPanel Orientation="Horizontal" Margin="0,0,0,0">
-                    <TextBlock Text="{Binding Value}" Width="24" HorizontalAlignment="Left" Padding="0"/>
-                    <TextBlock Text="{Binding Outcome}" Width="36" HorizontalAlignment="Left" Padding="0">
-                      <TextBlock.Styles>
-                        <Style Selector="TextBlock">
-                          <Setter Property="Foreground" Value="{Binding Outcome, Converter={conv:OutcomeToColorConverter}}"/>
-                        </Style>
-                      </TextBlock.Styles>
-                    </TextBlock>
-                    <TextBlock Text="{Binding DateTime, StringFormat='{}{0:dd.MM.yyyy HH:mm}'}" HorizontalAlignment="Right"/>
-                    <Button Content="X" HorizontalAlignment="Right" Padding="0" Margin="4,0,0,0"/>
-                  </StackPanel>
-                </DataTemplate>
-            </ListBox.ItemTemplate>
-          </ListBox>
-        </Expander>
-
-        </Grid>
-    </Border>
+      </Grid>
+  </Border>
 
 </Window>

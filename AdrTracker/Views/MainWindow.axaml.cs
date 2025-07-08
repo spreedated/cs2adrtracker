@@ -1,7 +1,7 @@
 using AdrTracker.Logic;
+using AdrTracker.ViewModels;
 using Avalonia.Controls;
 using neXn.Ui.Avalonia;
-using System.Linq;
 
 namespace AdrTracker.Views
 {
@@ -12,6 +12,8 @@ namespace AdrTracker.Views
         public MainWindow()
         {
             this.InitializeComponent();
+            ((MainWindowViewModel)this.DataContext).Instance = this;
+
             this.windowManager = new(this);
             this.dragHandler = new WindowDragHandler(this)
             {

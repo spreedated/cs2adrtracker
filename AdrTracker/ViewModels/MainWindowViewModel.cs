@@ -64,49 +64,59 @@ namespace AdrTracker.ViewModels
 
         [ObservableProperty]
         private Statistic statistic;
+
+        [ObservableProperty]
+        private string versionInfo;
         #endregion
 
         [ObservableProperty]
-        private ISeries[] series;
+        private ISeries[] quickStatsChartSeries;
+        public Axis[] HideAxesX { get; } = [new() { IsVisible = false }];
+        public Axis[] HideAxesY { get; } = [new() { IsVisible = false }];
 
         [ObservableProperty]
-        private Axis[] xAxes = [new() { IsVisible = false }];
+        private bool showQuickStatsChart;
 
         [ObservableProperty]
-        private Axis[] yAxes = [new() { IsVisible = false }];
-
+        private bool showQuickStatsString;
         #region Ctor
         public MainWindowViewModel()
         {
-            this.WindowTitle = typeof(MainWindowViewModel).Assembly.GetCustomAttribute<AssemblyTitleAttribute>()?.Title;
-            
+            this.WindowTitle = Globals.Assembly.GetCustomAttribute<AssemblyTitleAttribute>()?.Title;
+            this.versionInfo = $"Version: {Globals.Assembly.GetName().Version}";
+
             if (Design.IsDesignMode)
             {
                 this.Last10Records =
                 [
-                    new AdrRecord() { Value = 85, Timestamp = DateTimeOffset.Now.ToUnixTimeSeconds(), Outcome = AdrRecord.Outcomes.Win },
-                    new AdrRecord() { Value = 90, Timestamp = DateTimeOffset.Now.ToUnixTimeSeconds(), Outcome = AdrRecord.Outcomes.Win },
-                    new AdrRecord() { Value = 95, Timestamp = DateTimeOffset.Now.ToUnixTimeSeconds(), Outcome = AdrRecord.Outcomes.Win },
-                    new AdrRecord() { Value = 80, Timestamp = DateTimeOffset.Now.ToUnixTimeSeconds(), Outcome = AdrRecord.Outcomes.Loss },
-                    new AdrRecord() { Value = 75, Timestamp = DateTimeOffset.Now.ToUnixTimeSeconds(), Outcome = AdrRecord.Outcomes.Loss },
-                    new AdrRecord() { Value = 100, Timestamp = DateTimeOffset.Now.ToUnixTimeSeconds(), Outcome = AdrRecord.Outcomes.Win },
-                    new AdrRecord() { Value = 110, Timestamp = DateTimeOffset.Now.ToUnixTimeSeconds(), Outcome = AdrRecord.Outcomes.Win },
-                    new AdrRecord() { Value = 120, Timestamp = DateTimeOffset.Now.ToUnixTimeSeconds(), Outcome = AdrRecord.Outcomes.Draw },
-                    new AdrRecord() { Value = 130, Timestamp = DateTimeOffset.Now.ToUnixTimeSeconds(), Outcome = AdrRecord.Outcomes.Draw },
-                    new AdrRecord() { Value = 140, Timestamp = DateTimeOffset.Now.ToUnixTimeSeconds(), Outcome = AdrRecord.Outcomes.Win }
+                    new AdrRecord() { Value = 85, Timestamp = DateTimeOffset.Now.ToUnixTimeSeconds(), Outcome = AdrRecord.Outcomes.Victory },
+                    new AdrRecord() { Value = 90, Timestamp = DateTimeOffset.Now.ToUnixTimeSeconds(), Outcome = AdrRecord.Outcomes.Victory },
+                    new AdrRecord() { Value = 95, Timestamp = DateTimeOffset.Now.ToUnixTimeSeconds(), Outcome = AdrRecord.Outcomes.Victory },
+                    new AdrRecord() { Value = 80, Timestamp = DateTimeOffset.Now.ToUnixTimeSeconds(), Outcome = AdrRecord.Outcomes.Defeat },
+                    new AdrRecord() { Value = 75, Timestamp = DateTimeOffset.Now.ToUnixTimeSeconds(), Outcome = AdrRecord.Outcomes.Defeat },
+                    new AdrRecord() { Value = 100, Timestamp = DateTimeOffset.Now.ToUnixTimeSeconds(), Outcome = AdrRecord.Outcomes.Victory },
+                    new AdrRecord() { Value = 110, Timestamp = DateTimeOffset.Now.ToUnixTimeSeconds(), Outcome = AdrRecord.Outcomes.Victory },
+                    new AdrRecord() { Value = 120, Timestamp = DateTimeOffset.Now.ToUnixTimeSeconds(), Outcome = AdrRecord.Outcomes.Tie },
+                    new AdrRecord() { Value = 130, Timestamp = DateTimeOffset.Now.ToUnixTimeSeconds(), Outcome = AdrRecord.Outcomes.Tie },
+                    new AdrRecord() { Value = 140, Timestamp = DateTimeOffset.Now.ToUnixTimeSeconds(), Outcome = AdrRecord.Outcomes.Victory }
                 ];
                 this.CurrentAdr = 88.42f;
                 this.TrackedGamesCount = 142;
                 this.Statistic = new()
                 {
-                    Draws = 10,
-                    Losses = 20,
-                    Wins = 112
+                    Ties = 10,
+                    Defeats = 20,
+                    Victories = 112
                 };
+                this.ShowQuickStatsChart = true;
+                this.ShowQuickStatsString = true;
                 return;
             }
 
             this.logger = Log.Logger != null ? new SerilogLoggerProvider(Log.Logger).CreateLogger("MainWindowViewModel"): null;
+
+            this.ShowQuickStatsChart = Globals.Configuration.RuntimeConfiguration.ShowQuickStatsChart;
+            this.ShowQuickStatsString = Globals.Configuration.RuntimeConfiguration.ShowQuickStatsString;
 
             Task.Run(async () =>
             {
@@ -116,6 +126,33 @@ namespace AdrTracker.ViewModels
         #endregion
 
         #region Commands
+        [RelayCommand]
+        private async Task OpenStatistics()
+        {
+            //TODO: Open statistics window
+        }
+
+        [RelayCommand]
+        private async Task CloseApplication()
+        {
+            this.logger?.LogTrace("Application is closing");
+            await Serilog.Log.CloseAndFlushAsync();
+            this.Instance?.Close();
+        }
+
+        [RelayCommand]
+        private void ShowCheckBoxClick(MenuItem contextMenuItem)
+        {
+            if (contextMenuItem == null || string.IsNullOrEmpty(contextMenuItem.Tag?.ToString()))
+            {
+                return;
+            }
+
+            string propertyName = contextMenuItem.Tag?.ToString();
+
+            typeof(MainWindowViewModel).GetProperty(propertyName)?.SetValue(this, !(bool)typeof(MainWindowViewModel).GetProperty(propertyName)?.GetValue(this));
+        }
+
         [RelayCommand(CanExecute = nameof(CanAdd))]
         private async Task Add()
         {
@@ -172,27 +209,27 @@ namespace AdrTracker.ViewModels
             base.OnPropertyChanged(nameof(this.IndicatorBrush));
             base.OnPropertyChanged(nameof(this.IndicatorShadowColor));
 
-            this.Series =
+            this.QuickStatsChartSeries =
                 [
-                    new RowSeries<int>(this.Statistic.Wins)
+                    new RowSeries<int>(this.Statistic.Victories)
                     {
-                        Name = "Wins",
+                        Name = "Victories",
                         Fill = new SolidColorPaint(SKColors.LimeGreen),
                         DataLabelsSize = 14,
                         DataLabelsPosition = LiveChartsCore.Measure.DataLabelsPosition.Middle,
                         DataLabelsPaint = new SolidColorPaint(SKColors.WhiteSmoke)
                     },
-                    new RowSeries<int>(this.Statistic.Draws)
+                    new RowSeries<int>(this.Statistic.Ties)
                     {
-                        Name = "Draws",
+                        Name = "Ties",
                         Fill = new SolidColorPaint(SKColors.Gold),
                         DataLabelsSize = 14,
                         DataLabelsPosition = LiveChartsCore.Measure.DataLabelsPosition.Middle,
                         DataLabelsPaint = new SolidColorPaint(SKColors.WhiteSmoke)
                     },
-                    new RowSeries<int>(this.Statistic.Losses)
+                    new RowSeries<int>(this.Statistic.Defeats)
                     {
-                        Name = "Loss",
+                        Name = "Defeats",
                         Fill = new SolidColorPaint(SKColors.Firebrick),
                         DataLabelsSize = 14,
                         DataLabelsPosition = LiveChartsCore.Measure.DataLabelsPosition.Middle,

@@ -65,9 +65,9 @@ namespace DatabaseLayer.DataLayer
                         { "@t", adr.Timestamp },
                         { "@o", adr.Outcome switch
                         {
-                            AdrRecord.Outcomes.Loss => 1,
-                            AdrRecord.Outcomes.Win => 2,
-                            AdrRecord.Outcomes.Draw => 3,
+                            AdrRecord.Outcomes.Defeat => 1,
+                            AdrRecord.Outcomes.Victory => 2,
+                            AdrRecord.Outcomes.Tie => 3,
                             _ => 0
                         } }
                     };

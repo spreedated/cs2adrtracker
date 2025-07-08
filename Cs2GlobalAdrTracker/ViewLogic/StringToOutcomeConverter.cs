@@ -37,11 +37,11 @@ namespace Cs2GlobalAdrTracker.ViewLogic
             switch ((string)((ComboBoxItem)value).Content)
             {
                 case "Win":
-                    return AdrRecord.Outcomes.Win;
+                    return AdrRecord.Outcomes.Victory;
                 case "Loss":
-                    return AdrRecord.Outcomes.Loss;
+                    return AdrRecord.Outcomes.Defeat;
                 case "Draw":
-                    return AdrRecord.Outcomes.Draw;
+                    return AdrRecord.Outcomes.Tie;
                 default:
                     return AdrRecord.Outcomes.Unknown;
             }

@@ -2,8 +2,8 @@
 {
     public sealed record Statistic
     {
-        public int Draws { get; init; }
-        public int Losses { get; init; }
-        public int Wins { get; init; }
+        public int Ties { get; init; }
+        public int Defeats { get; init; }
+        public int Victories { get; init; }
     }
 }

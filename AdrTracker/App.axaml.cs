@@ -52,10 +52,7 @@ namespace AdrTracker
             if (base.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
             {
                 BindingPlugins.DataValidators.RemoveAt(0);
-                desktop.MainWindow = new MainWindow
-                {
-                    DataContext = new MainWindowViewModel(),
-                };
+                desktop.MainWindow = new MainWindow();
             }
 
             base.OnFrameworkInitializationCompleted();

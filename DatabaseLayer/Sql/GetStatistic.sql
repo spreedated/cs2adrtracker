@@ -1,6 +1,6 @@
 ﻿SELECT
-	SUM(outcome = 2) AS wins,
-	SUM(outcome = 3) AS draws,
-	SUM(outcome = 1) AS losses
+	SUM(outcome = 2) AS victories,
+	SUM(outcome = 3) AS ties,
+	SUM(outcome = 1) AS defeats
 FROM
 	adrs;

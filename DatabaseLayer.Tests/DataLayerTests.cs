@@ -9,7 +9,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 
-namespace UnitTests
+namespace DatabaseLayer.Tests
 {
     [TestFixture]
     public class DataLayerTests
@@ -72,7 +72,7 @@ namespace UnitTests
 
             Assert.That(this.database.conn.State, Is.EqualTo(ConnectionState.Closed));
 
-            this.database.Open();
+            this.database.OpenAsync().Wait();
 
             Assert.That(this.database.conn.State, Is.EqualTo(ConnectionState.Open));
 
@@ -252,7 +252,7 @@ namespace UnitTests
             Statistic s = this.database.GetStatistic();
 
             Assert.That(s, Is.Not.Null);
-            Assert.That(s.Wins + s.Losses + s.Draws, Is.EqualTo(1000));
+            Assert.That(s.Victories + s.Defeats + s.Ties, Is.EqualTo(1000));
         }
 
         [Test]

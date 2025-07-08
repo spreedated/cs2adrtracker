@@ -1,5 +1,6 @@
 <Application xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:lvc="using:LiveChartsCore.SkiaSharpView.Avalonia"
              x:Class="AdrTracker.App"
              xmlns:local="using:AdrTracker"
              RequestedThemeVariant="Dark">
@@ -112,18 +113,31 @@
         <Setter Property="FontSize" Value="12"/>
         <Setter Property="Background" Value="Transparent"/>
         <Setter Property="BorderThickness" Value="0"/>
+      </Style>
+
+      <Style Selector="ListBoxItem">
+        <Setter Property="Padding" Value="0"/>
+        <Setter Property="Margin" Value="0,0,0,2"/>
 
         <Style Selector="^ /template/ Border">
           <Setter Property="Background" Value="Transparent"/>
         </Style>
-      </Style>
 
-      <Style Selector="ListBoxItem:selected /template/ ContentPresenter#PART_ContentPresenter">
-        <Setter Property="Background" Value="Transparent"/>
-      </Style>
+        <Style Selector="^:pressed /template/ ContentPresenter#PART_ContentPresenter">
+          <Setter Property="Background" Value="Transparent"/>
+        </Style>
 
-      <Style Selector="ListBoxItem:pointerover /template/ ContentPresenter#PART_ContentPresenter">
-        <Setter Property="Background" Value="Transparent"/>
+        <Style Selector="^:selected /template/ ContentPresenter#PART_ContentPresenter">
+          <Setter Property="Background" Value="Transparent"/>
+        </Style>
+
+        <Style Selector="^:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+          <Setter Property="Background" Value="Transparent"/>
+        </Style>
+
+        <Style Selector="^:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+          <Setter Property="Background" Value="Transparent"/>
+        </Style>
       </Style>
       <!-- # ### #-->
 
@@ -131,55 +145,121 @@
       <Style Selector="Expander">
         <Setter Property="Template">
           <ControlTemplate>
-            <StackPanel>
-              <ToggleButton
-                Name="PART_Header"
-                Background="Transparent"
-                BorderBrush="Transparent"
-                BorderThickness="0"
-                Padding="4,2"
-                Content="{TemplateBinding Header}"
-                IsChecked="{TemplateBinding IsExpanded}"
-                Focusable="False">
-                <ToggleButton.ContentTemplate>
-                  <DataTemplate>
-                    <StackPanel Orientation="Horizontal" Spacing="4">
-                      <!-- Arrow icon -->
-                      <Path
-                        Width="12"
-                        Height="12"
-                        Stretch="Uniform"
-                        Stroke="WhiteSmoke"
-                        StrokeThickness="2"
-                        Data="M 3 5 L 6 8 L 9 5">
-                        <Path.RenderTransform>
-                          <RotateTransform Angle="{Binding IsChecked, RelativeSource={RelativeSource AncestorType=ToggleButton}}" CenterX="6" CenterY="6"/>
-                        </Path.RenderTransform>
-                      </Path>
-                      <ContentPresenter Content="{Binding}" />
-                    </StackPanel>
-                  </DataTemplate>
-                </ToggleButton.ContentTemplate>
-              </ToggleButton>
-              <ContentPresenter
-                Name="PART_Content"
-                IsVisible="{TemplateBinding IsExpanded}"
-                Content="{TemplateBinding Content}"/>
-            </StackPanel>
+            <DockPanel MinWidth="{TemplateBinding MinWidth}"
+                       MaxWidth="{TemplateBinding MaxWidth}">
+              <ToggleButton x:Name="ExpanderHeader"
+                            MinHeight="{TemplateBinding MinHeight}"
+                            CornerRadius="{TemplateBinding CornerRadius}"
+                            IsEnabled="{TemplateBinding IsEnabled}"
+                            Content="{TemplateBinding Header}"
+                            ContentTemplate="{TemplateBinding HeaderTemplate}"
+                            IsChecked="{TemplateBinding IsExpanded, Mode=TwoWay}"
+                            Background="Transparent"
+                            BorderThickness="0"/>
+              <Border x:Name="ExpanderContent"
+                      IsVisible="{TemplateBinding IsExpanded, Mode=TwoWay}"
+                      Background="Transparent"
+                      BorderBrush="{TemplateBinding BorderBrush}"
+                      BorderThickness="0"
+                      MinHeight="{TemplateBinding MinHeight}"
+                      HorizontalAlignment="Stretch"
+                      VerticalAlignment="Stretch"
+                      Padding="{TemplateBinding Padding}">
+                <ContentPresenter x:Name="PART_ContentPresenter"
+                                  Content="{TemplateBinding Content}"
+                                  ContentTemplate="{TemplateBinding ContentTemplate}"
+                                  Foreground="{TemplateBinding Foreground}"
+                                  HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                  VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}" />
+              </Border>
+            </DockPanel>
           </ControlTemplate>
         </Setter>
+
+        <Style Selector="^:down /template/ Border#ExpanderContent">
+          <Setter Property="BorderThickness" Value="0" />
+        </Style>
       </Style>
-      <Style Selector="Expander /template/ Border">
-        <Setter Property="Background" Value="Transparent"/>
-        <Setter Property="BorderBrush" Value="Transparent"/>
-        <Setter Property="BorderThickness" Value="0"/>
-      </Style>
-      <Style Selector="Expander /template/ ToggleButton#PART_Header">
-        <Setter Property="Background" Value="Transparent"/>
-        <Setter Property="BorderBrush" Value="Transparent"/>
-        <Setter Property="BorderThickness" Value="0"/>
-        <Setter Property="Padding" Value="0"/>
+
+      <Style Selector="ToggleButton">
+        <Setter Property="Template">
+          <ControlTemplate>
+            <Border x:Name="ToggleButtonBackground"
+                    CornerRadius="{TemplateBinding CornerRadius}"
+                    Background="{TemplateBinding Background}"
+                    BorderBrush="{TemplateBinding BorderBrush}"
+                    BorderThickness="{TemplateBinding BorderThickness}">
+              <Grid x:Name="ToggleButtonGrid"
+                    ColumnDefinitions="*,Auto">
+                <ContentPresenter x:Name="PART_ContentPresenter"
+                                  Content="{TemplateBinding Content}"
+                                  ContentTemplate="{TemplateBinding ContentTemplate}"
+                                  HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                  VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
+                                  Foreground="{TemplateBinding Foreground}"
+                                  Margin="{TemplateBinding Padding}"/>
+                <Border x:Name="ExpandCollapseChevronBorder"
+                        Grid.Column="1"
+                        Width="{DynamicResource ExpanderChevronButtonSize}"
+                        Height="{DynamicResource ExpanderChevronButtonSize}"
+                        Margin="{DynamicResource ExpanderChevronMargin}"
+                        CornerRadius="{DynamicResource ControlCornerRadius}"
+                        BorderBrush="{DynamicResource ExpanderChevronBorderBrush}"
+                        BorderThickness="{DynamicResource ExpanderChevronBorderThickness}"
+                        Background="{DynamicResource ExpanderChevronBackground}">
+                  <Path x:Name="ExpandCollapseChevron"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        RenderTransformOrigin="50%,50%"
+                        Stretch="None"
+                        Stroke="{DynamicResource ExpanderChevronForeground}"
+                        StrokeThickness="1">
+                    <Path.RenderTransform>
+                      <RotateTransform />
+                    </Path.RenderTransform>
+                  </Path>
+                </Border>
+              </Grid>
+            </Border>
+          </ControlTemplate>
+        </Setter>
+
+        <!-- PointerOver -->
+        <Style Selector="^:pointerover /template/ Border#ToggleButtonBackground">
+          <Setter Property="Background" Value="Transparent" />
+          <Setter Property="BorderBrush" Value="{DynamicResource ExpanderHeaderBorderBrushPointerOver}" />
+        </Style>
+        <Style Selector="^:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+          <Setter Property="Foreground" Value="{DynamicResource ExpanderHeaderForegroundPointerOver}" />
+        </Style>
+        <Style Selector="^:pointerover /template/ Border#ExpandCollapseChevronBorder">
+          <Setter Property="Background" Value="Transparent" />
+          <Setter Property="BorderBrush" Value="{DynamicResource ExpanderChevronBorderBrushPointerOver}" />
+        </Style>
+        <Style Selector="^:pointerover /template/ Path#ExpandCollapseChevron">
+          <Setter Property="Stroke" Value="{DynamicResource ExpanderChevronForegroundPointerOver}" />
+        </Style>
+
+        <!-- Pressed -->
+        <Style Selector="^:pressed /template/ Border#ToggleButtonBackground">
+          <Setter Property="Background" Value="Transparent" />
+          <Setter Property="BorderBrush" Value="{DynamicResource ExpanderHeaderBorderBrushPressed}" />
+        </Style>
+        <Style Selector="^:pressed /template/ Border#ExpandCollapseChevronBorder">
+          <Setter Property="Background" Value="Transparent" />
+          <Setter Property="BorderBrush" Value="{DynamicResource ExpanderChevronBorderBrushPressed}" />
+        </Style>
+        <Style Selector="^:pressed /template/ Path#ExpandCollapseChevron">
+          <Setter Property="Stroke" Value="{DynamicResource ExpanderChevronForegroundPressed}" />
+        </Style>
       </Style>
       <!-- # ### #-->
+
+      <Style Selector="lvc|CartesianChart#Quickstats">
+        <Setter Property="Height" Value="60"/>
+        <Setter Property="Width" Value="90"/>
+        <Setter Property="LegendPosition" Value="Hidden"/>
+        <Setter Property="TooltipPosition" Value="Hidden"/>
+      </Style>
     </Application.Styles>
 </Application>
