@@ -76,9 +76,19 @@ namespace AdrTracker.ViewModels
 
         [ObservableProperty]
         private bool showQuickStatsChart;
+        partial void OnShowQuickStatsChartChanged(bool value)
+        {
+            Globals.Configuration.RuntimeConfiguration.ShowQuickStatsChart = value;
+            Globals.Configuration.Save();
+        }
 
         [ObservableProperty]
         private bool showQuickStatsString;
+        partial void OnShowQuickStatsStringChanged(bool value)
+        {
+            Globals.Configuration.RuntimeConfiguration.ShowQuickStatsString = value;
+            Globals.Configuration.Save();
+        }
         #region Ctor
         public MainWindowViewModel()
         {

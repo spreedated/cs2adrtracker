@@ -7,6 +7,7 @@
         xmlns:conv="using:AdrTracker.Converters"
         xmlns:nuab="using:neXn.Ui.Avalonia.Behaviors"
         xmlns:lvc="using:LiveChartsCore.SkiaSharpView.Avalonia"
+        xmlns:i="https://github.com/projektanker/icons.avalonia"
         mc:Ignorable="d"
         x:Class="AdrTracker.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
@@ -140,24 +141,45 @@
             <TextBlock Text="{Binding Last10Average, StringFormat=Last 10 Matches ({0:#.##})}"/>
           </StackPanel>
         </Expander.Header>
-        <ListBox ItemsSource="{Binding Last10Records}" BorderThickness="0">
-          <ListBox.ItemTemplate>
+        <StackPanel>
+          <Grid Margin="0,0,0,0">
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="84"/>
+              <ColumnDefinition Width="20"/>
+              <ColumnDefinition Width="48"/>
+              <ColumnDefinition Width="24"/>
+            </Grid.ColumnDefinitions>
+            <TextBlock FontSize="10" Grid.Column="0" Text="Date" FontWeight="Bold" HorizontalAlignment="Center"/>
+            <TextBlock FontSize="10" Grid.Column="1" Text="ADR" FontWeight="Bold" HorizontalAlignment="Center"/>
+            <TextBlock FontSize="10" Grid.Column="2" Text="Outcome" FontWeight="Bold" HorizontalAlignment="Center"/>
+          </Grid>
+
+          <ListBox ItemsSource="{Binding Last10Records}" BorderThickness="0">
+            <ListBox.ItemTemplate>
               <DataTemplate>
-                <StackPanel Orientation="Horizontal" Margin="0,0,0,0">
-                  <TextBlock Text="{Binding DateTime, StringFormat='{}{0:dd.MM.yy - HH:mm}'}" HorizontalAlignment="Left" Margin="0,0,12,0"/>
-                  <TextBlock Text="{Binding Value}" Width="24" HorizontalAlignment="Left" Padding="0"/>
-                  <TextBlock Text="{Binding Outcome}" Width="36" HorizontalAlignment="Right" Padding="0">
+                <Grid Margin="0,0,0,0">
+                  <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="84"/>
+                    <ColumnDefinition Width="20"/>
+                    <ColumnDefinition Width="48"/>
+                    <ColumnDefinition Width="24"/>
+                  </Grid.ColumnDefinitions>
+
+                  <TextBlock Grid.Column="0" Text="{Binding DateTime, StringFormat='{}{0:dd.MM.yy - HH:mm}'}" Margin="0,0,12,0"/>
+                  <TextBlock Grid.Column="1" Text="{Binding Value}" Padding="0"/>
+                  <TextBlock Grid.Column="2" Text="{Binding Outcome}" HorizontalAlignment="Center" Padding="0">
                     <TextBlock.Styles>
                       <Style Selector="TextBlock">
                         <Setter Property="Foreground" Value="{Binding Outcome, Converter={conv:OutcomeToColorConverter}}"/>
                       </Style>
                     </TextBlock.Styles>
                   </TextBlock>
-                  <Button Content="X" HorizontalAlignment="Right" Padding="0" Margin="4,0,0,0"/>
-                </StackPanel>
+                  <Button Grid.Column="3" Name="Delete" i:Attached.Icon="mdi-delete" HorizontalAlignment="Right" Margin="4,0,0,0" Width="24"/>
+                </Grid>
               </DataTemplate>
-          </ListBox.ItemTemplate>
-        </ListBox>
+            </ListBox.ItemTemplate>
+          </ListBox>
+        </StackPanel>
       </Expander>
       <!-- # ### # -->
 
