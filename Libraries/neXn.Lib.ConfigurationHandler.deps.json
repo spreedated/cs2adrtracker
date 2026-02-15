@@ -1,34 +1,23 @@
 {
   "runtimeTarget": {
-    "name": ".NETCoreApp,Version=v9.0",
+    "name": ".NETCoreApp,Version=v10.0",
     "signature": ""
   },
   "compilationOptions": {},
   "targets": {
-    ".NETCoreApp,Version=v9.0": {
-      "neXn.Lib.ConfigurationHandler/9.0.3": {
-        "dependencies": {
-          "System.Text.Json": "9.0.6"
-        },
+    ".NETCoreApp,Version=v10.0": {
+      "neXn.Lib.ConfigurationHandler/10.0.1": {
         "runtime": {
           "neXn.Lib.ConfigurationHandler.dll": {}
         }
-      },
-      "System.Text.Json/9.0.6": {}
+      }
     }
   },
   "libraries": {
-    "neXn.Lib.ConfigurationHandler/9.0.3": {
+    "neXn.Lib.ConfigurationHandler/10.0.1": {
       "type": "project",
       "serviceable": false,
       "sha512": ""
-    },
-    "System.Text.Json/9.0.6": {
-      "type": "package",
-      "serviceable": true,
-      "sha512": "sha512-h+ZtYTyTnTh5Ju6mHCKb3FPGx4ylJZgm9W7Y2psUnkhQRPMOIxX+TCN0ZgaR/+Yea+93XHWAaMzYTar1/EHIPg==",
-      "path": "system.text.json/9.0.6",
-      "hashPath": "system.text.json.9.0.6.nupkg.sha512"
     }
   }
 }
